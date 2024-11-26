@@ -5,7 +5,7 @@ from matplotlib.axes._axes import Axes
 from typing import Literal, Union, Iterable, assert_never
 from dataclasses import dataclass
 from pypalettes import load_cmap
-from api import Player
+from atp_api import Player
 
 # MARK: Text
 
