@@ -20,7 +20,7 @@ class PlayerData:
         return True
 
     def __init__(self, id: str, json: JSONDict) -> None:
-        self.id = id
+        self.id = id.lower()
 
         self.name_first = json.get_str("FirstName")
         self.name_last = json.get_str("LastName")

@@ -105,7 +105,7 @@ def _get_ranking(url: str) -> list[PlayerRow]:
         link_no_overview = link[:overview_start_index]
         id_start_index = link_no_overview.rindex("/")
         assert id_start_index != -1
-        id: str = link_no_overview[id_start_index:].lstrip("/")
+        id: str = link_no_overview[id_start_index:].lstrip("/").lower()
 
         p = PlayerRow(id, rank, name, link)
         result.append(p)
