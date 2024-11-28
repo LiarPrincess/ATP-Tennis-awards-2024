@@ -1,5 +1,55 @@
-from typing import Any, Protocol, TypeVar, Callable
-from atp_api import Player
+from typing import Any, Protocol, TypeVar, Callable, assert_never
+from atp_api import (
+    Player,
+    PlayerMatch,
+    PlayerMatch_Played,
+    PlayerMatch_Walkover,
+    PlayerMatch_Retire,
+    PlayerMatch_Default,
+    PlayerMatch_Bye,
+    PlayerMatch_NotPlayed,
+)
+
+# MARK: Str
+
+
+def to_str_player(p: Player) -> str:
+    return f"{p.rank} {p.nationality.emoji} {p.name_first} {p.name_last}"
+
+
+def to_str_sets(m: PlayerMatch) -> str:
+    if isinstance(m, PlayerMatch_Bye):
+        return ""
+
+    if isinstance(m, PlayerMatch_NotPlayed):
+        return ""
+
+    if isinstance(m, PlayerMatch_Walkover):
+        return "Walkover"
+
+    if isinstance(m, PlayerMatch_Played | PlayerMatch_Retire | PlayerMatch_Default):
+        result = ""
+
+        for s in m.sets:
+            if s:
+                result += " "
+
+            if m.win_loss == "W":
+                result += str(s.player)
+                result += str(s.opponent)
+            elif m.win_loss == "L":
+                result += str(s.opponent)
+                result += str(s.player)
+            else:
+                assert_never(m.win_loss)
+
+            if s.tie_break:
+                result += f"({s.tie_break})"
+
+        return result
+
+    assert_never(m)
+
 
 # MARK: ABC
 
@@ -27,7 +77,8 @@ def filter_award_min(
     count: int,
     key: Callable[[THasPlayer], Any],
 ) -> list[THasPlayer]:
-    return _filter_award(iterable, count, key, reverse=False)
+    os = [o for o in iterable if _can_receive_award(o)]
+    return _filter_award(os, count, key, is_max=False)
 
 
 def filter_award_max(
@@ -35,19 +86,36 @@ def filter_award_max(
     count: int,
     key: Callable[[THasPlayer], Any],
 ) -> list[THasPlayer]:
-    return _filter_award(iterable, count, key, reverse=True)
+    os = [o for o in iterable if _can_receive_award(o)]
+    return _filter_award(os, count, key, is_max=True)
+
+
+def filter_award_min_NO_can_receive_award_check(
+    iterable: list[T],
+    count: int,
+    key: Callable[[T], Any],
+) -> list[T]:
+    return _filter_award(iterable, count, key, is_max=False)
+
+
+def filter_award_max_NO_can_receive_award_check(
+    iterable: list[T],
+    count: int,
+    key: Callable[[T], Any],
+) -> list[T]:
+    return _filter_award(iterable, count, key, is_max=True)
 
 
 def _filter_award(
-    iterable: list[THasPlayer],
+    iterable: list[T],
     count: int,
-    key: Callable[[THasPlayer], Any],
-    reverse: bool,
-) -> list[THasPlayer]:
-    os = [(o, key(o)) for o in iterable if _can_receive_award(o)]
-    os_sorted = sorted(os, key=lambda o: o[1], reverse=reverse)
+    key: Callable[[T], Any],
+    is_max: bool,
+) -> list[T]:
+    os = [(o, key(o)) for o in iterable]
+    os_sorted = sorted(os, key=lambda o: o[1], reverse=is_max)
 
-    result = list[THasPlayer]()
+    result = list[T]()
     unique_keys = list[Any]()  # Multiple entries with the same key
 
     for o, k in os_sorted:

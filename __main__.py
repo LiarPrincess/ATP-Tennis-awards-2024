@@ -3,6 +3,7 @@ from page import Page, Title
 from atp_api import Player, get_ranking_top_100_for_date, get_players
 from write_1_ranking_change import write_ranking_change
 from write_1_ranking_volatility import write_ranking_volatility
+from write_2_gsm_versus import write_game_set_match_versus
 
 _PLAYER_COUNT = 50
 # Day has to be one of the days the ranking is published.
@@ -37,15 +38,23 @@ def main():
         award_count_drop=3,
     )
 
-    write_ranking_volatility(
+
+    # MARK: Game, set, match
+
+    print("Writing: Game, set, match")
+
+    page = Page()
+    page.add(Title("Game, set, match"))
+
+    write_game_set_match_versus(
         page,
-        ranking=players,
+        players=players,
         date_from=_RANKING_PAST_DATE,
-        award_count_min_spread=5,
-        award_count_max_spread=5,
+        top_N=10,
+        award_count_unluckiest=5,
     )
 
-    path = os.path.join(output_dir_path, "1_ranking.md")
+    # MARK: Fin
     page.write_html(path, width=1400)
     print("Before publishing please DELETE CACHE and generate again.")
 

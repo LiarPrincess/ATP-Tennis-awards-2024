@@ -137,7 +137,7 @@ class PlayerMatch_Opponent:
 class PlayerMatch_Set:
     player: int
     opponent: int
-    tie: int | None
+    tie_break: int | None
 
 
 PlayerMatch_PrematureEndReason = Literal["Walkover", "Retire", "Default", "Unplayed"]
