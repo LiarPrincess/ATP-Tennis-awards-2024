@@ -2,7 +2,8 @@ import os
 import matplotlib.pyplot as plt
 from matplotlib.ticker import MultipleLocator
 from matplotlib.axes._axes import Axes
-from typing import Literal, Union, Iterable, assert_never
+from matplotlib.collections import Collection
+from typing import Literal, Union, Iterable, Sequence, assert_never
 from dataclasses import dataclass
 from pypalettes import load_cmap
 from atp_api import Player
@@ -100,9 +101,14 @@ class Chart:
         self.fig, self.ax = plt.subplots(layout="constrained")
         self.x_axis = Chart.XAxis(self.ax)
         self.y_axis = Chart.YAxis(self.ax)
+        self._aspect_rato: tuple[float, float] | None = None
 
     def set_title(self, value: str):
         self.ax.set_title(value)
+
+    def set_aspect_rato(self, width: float, height: float):
+        "Aspect_rato 2:1 means 200px:100px."
+        self._aspect_rato = (width, height)
 
     def set_show_grid(self, value: bool):
         self.ax.grid(value)
@@ -135,6 +141,28 @@ class Chart:
     ):
         self.ax.scatter(x, y, s=size, c=color, marker=marker)
 
+    @dataclass
+    class Heatmap:
+        im: Collection
+
+    def add_heatmap(
+        self,
+        xs: Sequence[int],
+        ys: Sequence[int],
+        values: Sequence[Sequence[int | float]],
+        *,
+        shading: Literal["flat", "nearest", "auto"] | None = None,
+    ) -> Heatmap:
+        im = self.ax.pcolor(xs, ys, values, shading=shading)
+        return Chart.Heatmap(im)
+
+    def add_color_bar(self, heatmap: Heatmap, label: str | None = None):
+        # https://python-graph-gallery.com/heatmap-for-timeseries-matplotlib/
+        cb = self.ax.figure.colorbar(heatmap.im, ax=self.ax)
+
+        if label is not None:
+            cb.ax.set_ylabel(label)
+
     def create_color_map(
         self, values: Iterable[int | float]
     ) -> dict[int | float, RGBA]:
@@ -153,6 +181,15 @@ class Chart:
         dpi = 100
         self.fig.set_dpi(dpi)
         self.fig.set_figwidth(width / dpi)
+
+        if self._aspect_rato is not None:
+            # Aspect_rato 2:1 means 200px:100px, proportions
+            # width  | aspect_width
+            # height | aspect_height
+            as_width, as_height = self._aspect_rato
+            height = width * as_height / as_width
+            self.fig.set_figheight(height / dpi)
+
         self.fig.savefig(path)
         plt.close(self.fig)
 

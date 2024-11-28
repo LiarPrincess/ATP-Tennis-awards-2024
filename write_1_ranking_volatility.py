@@ -29,7 +29,7 @@ class _Row:
 
 def write_ranking_volatility(
     page: Page,
-    ranking: list[Player],
+    players: list[Player],
     date_from: str,
     award_count_min_spread: int,
     award_count_max_spread: int,
@@ -40,7 +40,7 @@ def write_ranking_volatility(
 
     rows = list[_Row]()
 
-    for p in ranking:
+    for p in players:
         ranks = [r for r in p.career_rank_history if r.date >= date_from]
         ranks.sort(key=lambda r: r.date)
         assert ranks
