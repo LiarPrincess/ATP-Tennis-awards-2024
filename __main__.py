@@ -54,6 +54,13 @@ def main():
         award_count_unluckiest=5,
     )
 
+    write_game_set_match_game_count(
+        page,
+        players=players,
+        date_from=_RANKING_PAST_DATE,
+        award_count=6,
+    )
+
     # MARK: Fin
     page.write_html(path, width=1400)
     print("Before publishing please DELETE CACHE and generate again.")

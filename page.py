@@ -125,6 +125,16 @@ class Chart:
     ):
         self.ax.bar(x, height, bottom=bottom, color=color)
 
+    def add_bars(
+        self,
+        x: Sequence[int],
+        height: Sequence[int | float],
+        *,
+        bottom: Sequence[int | float] | None = None,
+        color: RGBA | None = None,
+    ):
+        self.ax.bar(x, height, bottom=bottom, color=color)
+
     # https://matplotlib.org/stable/api/markers_api.html
     ScatterMarker = Literal[
         ".", "o", "v", "^", "<", ">", "s", "p", "P", "*", "+", "x", "X", "D", "|", "_"
