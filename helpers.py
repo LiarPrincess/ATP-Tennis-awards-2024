@@ -14,7 +14,7 @@ from atp_api import (
 
 
 def to_str_player(p: Player) -> str:
-    return f"{p.rank} {p.nationality.emoji} {p.name_first} {p.name_last}"
+    return f"{p.rank} {p.nationality.flag_emoji} {p.name_first} {p.name_last}"
 
 
 def to_str_sets(m: PlayerMatch) -> str:

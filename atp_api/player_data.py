@@ -1,7 +1,7 @@
 from typing import Literal
-from dataclasses import dataclass
 from atp_api.json_dict import JSONDict
 from atp_api.helpers import create_urls, get_json
+from atp_api.countries import get_country_by_ioc_code
 
 CACHE_PATH = "cache/atp_player_data"
 
@@ -31,7 +31,8 @@ class PlayerData:
         self.birth_date = json.get_str("BirthDate")
 
         nationality_id = json.get_str("NatlId")
-        self.nationality = _NATIONALITY_ID_TO_NATIONALITY[nationality_id]
+        self.nationality = get_country_by_ioc_code(nationality_id)
+
         # self.nationality = json.get_str("Nationality")
         # self.nationality_birth_city = json.get_str_or_none("BirthCity")
         self.nationality_residence = json.get_str_or_none("Residence")
@@ -122,50 +123,3 @@ def get_players_data_json(player_ids: list[str]) -> dict[str, JSONDict]:
         result[p.id] = json
 
     return result
-
-
-# MARK: Nationality
-
-
-@dataclass
-class PlayerNationality:
-    id: str
-    name: str
-    emoji: str
-
-
-_NATIONALITY_ID_TO_NATIONALITY: dict[str, PlayerNationality] = {
-    "ARG": PlayerNationality("ARG", "Argentina", "🇦🇷"),
-    "AUS": PlayerNationality("AUS", "Australia", "🇦🇺"),
-    "AUT": PlayerNationality("AUT", "Austria", "🇦🇹"),
-    "BEL": PlayerNationality("BEL", "Belgium", "🇧🇪"),
-    "BRA": PlayerNationality("BRA", "Brazil", "🇧🇷"),
-    "BUL": PlayerNationality("BUL", "Bulgaria", "🇧🇬"),
-    "CAN": PlayerNationality("CAN", "Canada", "🇨🇦"),
-    "CHI": PlayerNationality("CHI", "Chile", "🇨🇱"),
-    "CHN": PlayerNationality("CHN", "China", "🇨🇳"),
-    "COL": PlayerNationality("COL", "Colombia", "🇨🇴"),
-    "CRO": PlayerNationality("CRO", "Croatia", "🇭🇷"),
-    "CZE": PlayerNationality("CZE", "Czechia", "🇨🇿"),
-    "DEN": PlayerNationality("DEN", "Denmark", "🇩🇰"),
-    "ESP": PlayerNationality("ESP", "Spain", "🇪🇸"),
-    "FIN": PlayerNationality("FIN", "Finland", "🇫🇮"),
-    "FRA": PlayerNationality("FRA", "France", "🇫🇷"),
-    "GBR": PlayerNationality("GBR", "Great Britain", "🇬🇧"),  # ?
-    "GER": PlayerNationality("GER", "Germany", "🇩🇪"),
-    "GRE": PlayerNationality("GRE", "Greece", "🇬🇷"),
-    "HUN": PlayerNationality("HUN", "Hungary", "🇭🇺"),
-    "IND": PlayerNationality("IND", "India", "🇮🇳"),
-    "ITA": PlayerNationality("ITA", "Italy", "🇮🇹"),
-    "JPN": PlayerNationality("JPN", "Japan", "🇯🇵"),
-    "KAZ": PlayerNationality("KAZ", "Kazakhstan", "🇰🇿"),
-    "NED": PlayerNationality("NED", "Netherlands", "🇳🇱"),
-    "NOR": PlayerNationality("NOR", "Norway", "🇳🇴"),
-    "PER": PlayerNationality("PER", "Peru", "🇵🇪"),
-    "POL": PlayerNationality("POL", "Poland", "🇵🇱"),
-    "POR": PlayerNationality("POR", "Portugal", "🇵🇹"),
-    "RUS": PlayerNationality("RUS", "Russia", "⬜"),
-    "SRB": PlayerNationality("SRB", "Serbia", "🇷🇸"),
-    "SUI": PlayerNationality("SRB", "Switzerland", "🇨🇭"),
-    "USA": PlayerNationality("USA", "United States", "🇺🇸"),
-}

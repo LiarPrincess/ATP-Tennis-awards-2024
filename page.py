@@ -257,7 +257,7 @@ class Page:
                             values.append(str(v))
                         elif isinstance(v, Player):
                             assert v.rank is not None
-                            flag = v.nationality.emoji
+                            flag = v.nationality.flag_emoji
                             rank_pad = " " if v.rank < 10 else ""
                             values.append(
                                 f"{rank_pad}{v.rank} {flag} {v.name_first} {v.name_last}"
