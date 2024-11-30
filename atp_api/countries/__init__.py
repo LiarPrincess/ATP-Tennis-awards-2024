@@ -23,42 +23,62 @@ class Country:
 
 @dataclass
 class _Cache:
-    _alpha2_to_country: dict[str, Country]
-    _alpha3_to_country: dict[str, Country]
-    _ioc_code_to_country: dict[str, Country]
+    countries: list[Country]
+    continents: list[Continent]
+    alpha2_to_country: dict[str, Country]
+    alpha3_to_country: dict[str, Country]
+    ioc_code_to_country: dict[str, Country]
 
 
-_CACHE: _Cache | None = None
+def get_all_countries() -> list[Country]:
+    data = _read_data()
+    return data.countries
+
+
+def get_all_continents() -> list[Continent]:
+    data = _read_data()
+    return data.continents
 
 
 def get_country_by_ioc_code(code: str) -> Country:
     "Get country by International Olympic Committee code."
-    global _CACHE
-    assert len(code) == 3
+    data = _read_data()
+    return data.ioc_code_to_country[code]
 
-    if _CACHE is None:
-        continents = _read_continents()
-        alpha2_to_alpha3 = _read_alpha2_to_alpha3()
-        alpha2_to_ioc_code = _read_alpha2_to_ioc_code()
-        alpha2_to_emoji_flag = _read_alpha2_to_emoji_flag()
-        countries = _read_countries(
-            continents,
-            alpha2_to_alpha3,
-            alpha2_to_ioc_code,
-            alpha2_to_emoji_flag,
-        )
 
-        alpha2_to_country = dict[str, Country]()
-        alpha3_to_country = dict[str, Country]()
-        ioc_code_to_country = dict[str, Country]()
-        _CACHE = _Cache(alpha2_to_country, alpha3_to_country, ioc_code_to_country)
+# MARK: Cache
 
-        for c in countries:
-            _CACHE._alpha2_to_country[c.alpha2] = c
-            _CACHE._alpha3_to_country[c.alpha3] = c
-            _CACHE._ioc_code_to_country[c.ioc_code] = c
+_DATA_CACHE: _Cache | None = None
 
-    return _CACHE._ioc_code_to_country[code]
+
+def _read_data() -> _Cache:
+    global _DATA_CACHE
+
+    if _DATA_CACHE is not None:
+        return _DATA_CACHE
+
+    continents = _read_continents()
+    alpha2_to_alpha3 = _read_alpha2_to_alpha3()
+    alpha2_to_ioc_code = _read_alpha2_to_ioc_code()
+    alpha2_to_emoji_flag = _read_alpha2_to_emoji_flag()
+    countries = _read_countries(
+        continents,
+        alpha2_to_alpha3,
+        alpha2_to_ioc_code,
+        alpha2_to_emoji_flag,
+    )
+
+    _DATA_CACHE = _Cache(countries, continents, {}, {}, {})
+
+    for c in countries:
+        _DATA_CACHE.alpha2_to_country[c.alpha2] = c
+        _DATA_CACHE.alpha3_to_country[c.alpha3] = c
+        _DATA_CACHE.ioc_code_to_country[c.ioc_code] = c
+
+    return _DATA_CACHE
+
+
+# MARK: Read
 
 
 def _read_continents() -> list[Continent]:

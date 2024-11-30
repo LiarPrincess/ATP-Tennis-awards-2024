@@ -1,4 +1,14 @@
-from typing import Any, Protocol, TypeVar, Callable, assert_never
+from typing import (
+    Any,
+    Iterator,
+    Protocol,
+    TypeVar,
+    Callable,
+    Generic,
+    Iterable,
+    assert_never,
+)
+
 from atp_api import (
     Player,
     PlayerMatch,
@@ -54,6 +64,7 @@ def to_str_sets(m: PlayerMatch) -> str:
 # MARK: ABC
 
 T = TypeVar("T")
+U = TypeVar("U")
 
 
 class HasPlayer(Protocol):
@@ -66,14 +77,14 @@ THasPlayer = TypeVar("THasPlayer", bound=HasPlayer)
 
 
 def filter_award_equal(
-    iterable: list[THasPlayer],
+    iterable: Iterable[THasPlayer],
     key: Callable[[THasPlayer], bool],
 ) -> list[THasPlayer]:
     return [o for o in iterable if _can_receive_award(o) and key(o)]
 
 
 def filter_award_min(
-    iterable: list[THasPlayer],
+    iterable: Iterable[THasPlayer],
     count: int,
     key: Callable[[THasPlayer], Any],
 ) -> list[THasPlayer]:
@@ -82,7 +93,7 @@ def filter_award_min(
 
 
 def filter_award_max(
-    iterable: list[THasPlayer],
+    iterable: Iterable[THasPlayer],
     count: int,
     key: Callable[[THasPlayer], Any],
 ) -> list[THasPlayer]:
@@ -91,7 +102,7 @@ def filter_award_max(
 
 
 def filter_award_min_NO_can_receive_award_check(
-    iterable: list[T],
+    iterable: Iterable[T],
     count: int,
     key: Callable[[T], Any],
 ) -> list[T]:
@@ -99,7 +110,7 @@ def filter_award_min_NO_can_receive_award_check(
 
 
 def filter_award_max_NO_can_receive_award_check(
-    iterable: list[T],
+    iterable: Iterable[T],
     count: int,
     key: Callable[[T], Any],
 ) -> list[T]:
@@ -107,7 +118,7 @@ def filter_award_max_NO_can_receive_award_check(
 
 
 def _filter_award(
-    iterable: list[T],
+    iterable: Iterable[T],
     count: int,
     key: Callable[[T], Any],
     is_max: bool,
@@ -180,3 +191,26 @@ def substring_until(s: str, until: str) -> str:
         return s[:index]
     except ValueError:
         return s
+
+
+# MARK: Collections
+
+
+class groupby(Generic[T, U]):
+    "'itertools.groupby' requires sorted data"
+
+    def __init__(self, iterable: list[T], key: Callable[[T], U]):
+        self._data = dict[U, list[T]]()
+
+        for o in iterable:
+            k = key(o)
+            group = self._data.get(k)
+
+            if group is None:
+                self._data[k] = [o]
+            else:
+                group.append(o)
+
+    def __iter__(self) -> Iterator[tuple[U, list[T]]]:
+        c = self._data.items()
+        return iter(c)

@@ -15,6 +15,7 @@ from atp_api.player_activity import (
     PlayerMatch_Retire,
     PlayerMatch_Default,
 )
+from atp_api.countries import Country, Continent, get_all_countries, get_all_continents
 
 from typing import Literal as _Literal, assert_never as _assert_never
 from atp_api.player_data import PlayerData as _PlayerData

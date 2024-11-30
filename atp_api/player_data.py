@@ -34,8 +34,11 @@ class PlayerData:
         self.nationality = get_country_by_ioc_code(nationality_id)
 
         # self.nationality = json.get_str("Nationality")
-        # self.nationality_birth_city = json.get_str_or_none("BirthCity")
+        self.nationality_birth_city = json.get_str_or_none("BirthCity")
         self.nationality_residence = json.get_str_or_none("Residence")
+
+        if self.nationality_residence == "-":
+            self.nationality_residence = None
 
         # self.height_ft = json.get_str("HeightFt")
         # self.height_in = json.get_int("HeightIn")
