@@ -19,10 +19,10 @@ def to_str_player(p: Player) -> str:
 
 def to_str_sets(m: PlayerMatch) -> str:
     if isinstance(m, PlayerMatch_Bye):
-        return ""
+        return "Bye"
 
     if isinstance(m, PlayerMatch_NotPlayed):
-        return ""
+        return "Not played"
 
     if isinstance(m, PlayerMatch_Walkover):
         return "Walkover"

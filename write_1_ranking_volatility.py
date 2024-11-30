@@ -97,7 +97,7 @@ def write_ranking_volatility(
 
     # X axis
     x_axis = chart.x_axis
-    x_axis.set_label("Player ranking")
+    x_axis.set_label("Player rank")
 
     # Y axis
     y_axis = chart.y_axis

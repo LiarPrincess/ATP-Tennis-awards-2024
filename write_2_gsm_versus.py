@@ -138,11 +138,11 @@ def write_game_set_match_versus(
 
     # X axis
     x_axis = chart.x_axis
-    x_axis.set_label("Player ranking")
+    x_axis.set_label("Player rank")
 
     # Y axis
     y_axis = chart.y_axis
-    y_axis.set_label("Opponent ranking")
+    y_axis.set_label("Opponent rank")
     chart.y_axis.set_major_ticks(5)
     chart.y_axis.set_minor_ticks(1)
 

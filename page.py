@@ -131,7 +131,7 @@ class Chart:
         height: Sequence[int | float],
         *,
         bottom: Sequence[int | float] | None = None,
-        color: RGBA | None = None,
+        color: Sequence[RGBA] | None = None,
     ):
         self.ax.bar(x, height, bottom=bottom, color=color)
 
@@ -150,6 +150,20 @@ class Chart:
         size: int | None = None,
     ):
         self.ax.scatter(x, y, s=size, c=color, marker=marker)
+
+    def add_scatters(
+        self,
+        x: Sequence[int],
+        y: Sequence[int | float],
+        *,
+        marker: ScatterMarker | None = None,
+        color: Literal["black"] | None = None,
+        size: int | None = None,
+    ):
+        self.ax.scatter(x, y, s=size, c=color, marker=marker)
+
+    def add_legend(self, entries: list[str]):
+        self.fig.legend(entries)
 
     @dataclass
     class Heatmap:

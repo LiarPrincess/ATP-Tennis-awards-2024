@@ -120,11 +120,11 @@ def write_game_set_match_game_count(
     tie_count = [-r.game_lost_tie_break_count for r in rows]
     add_bars(count, "pink", tie_count, "black")
 
-    chart.fig.legend(("Win", "Tie-break win", "Loss", "Tie-break loss"))
+    chart.add_legend(["Win", "Tie-break win", "Loss", "Tie-break loss"])
 
     # X axis
     x_axis = chart.x_axis
-    x_axis.set_label("Player ranking")
+    x_axis.set_label("Player rank")
 
     # Y axis
     y_axis = chart.y_axis

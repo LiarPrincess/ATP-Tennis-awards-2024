@@ -21,6 +21,7 @@ class PlayerTournament:
         "ATP Cup",
         "Laver Cup",
         "United Cup",
+        "World Team Cup",
         "1000",
         "500",
         "250",
@@ -76,7 +77,7 @@ class PlayerTournament:
         # self.dbl_draw_size = json.get_int("DblDrawSize")
 
         self.prize = json.get_int("Prize")
-        self.prize_currency_symbol = json.get_str("CurrSymbol")
+        self.prize_currency_symbol = json.get_str_or_none("CurrSymbol")
         self.prize_usd = json.get_int("PrizeUsd")
 
         self.player_won_count = json.get_int("Won")
@@ -289,6 +290,10 @@ def _get_tournament_type(name: str, type: str) -> PlayerTournament.Type:
     if type == "UC":
         assert name == "United Cup"
         return "United Cup"
+
+    if type == "WT":
+        assert name == "World Team Cup"
+        return "World Team Cup"
 
     assert type in (
         "1000",
