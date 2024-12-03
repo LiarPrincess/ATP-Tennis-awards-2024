@@ -59,6 +59,22 @@ def write_map_nationality(
     page.add(Subtitle(f"Number of players per country"))
     _write_map(page, countries)
 
+    _write_award_for_best_tally(
+        page,
+        countries,
+        award_count_best_countries,
+    )
+
+    page.add(Subtitle(f"Number of players per continent"))
+
+    _write_continent_count_table(page, continents)
+
+    _write_awards_for_best_in_continent(
+        page,
+        players,
+        award_count_best_player_per_continent,
+    )
+
 
 # MARK: Map
 
@@ -104,6 +120,22 @@ def _write_map(page: Page, countries: list[CountryPlayers]):
     map.add_data(data, value_min=0, value_max=players_len_max)
 
 
+# MARK: Table
+
+
+def _write_continent_count_table(page: Page, continents: list[ContinentPlayers]):
+    table = Table()
+    table.headers.append(Table.Header("Name"))
+    table.headers.append(Table.Header("Count"))
+    page.add(table)
+
+    continents = sorted(continents, key=lambda c: (-c.players_len, c.continent.name))
+
+    for c in continents:
+        continent = c.continent
+        name = continent.name
+        row = Table.Row([name, c.players_len])
+        table.rows.append(row)
 
 
 # MARK: Awards
