@@ -1,3 +1,5 @@
+import pandas as pd
+import geopandas as gpd
 from typing import Iterable
 from dataclasses import dataclass
 from page import Page, Award, Table
@@ -55,6 +57,97 @@ def write_map_nationality(
 
     countries.sort(key=lambda c: c.players_len, reverse=True)
     continents.sort(key=lambda c: c.players_len, reverse=True)
+
+    # MARK: Map
+
+    import matplotlib.pyplot as plt
+    import matplotlib.cm as cm
+    import matplotlib.colors as mcolors
+    import matplotlib.patches as patches
+    from pypalettes import load_cmap
+
+    # Data
+    # https://www.naturalearthdata.com/downloads/110m-cultural-vectors/
+    # Tutorials
+    # https://python-graph-gallery.com/web-map-europe-with-color-by-country/
+    # https://python-graph-gallery.com/web-map-with-custom-legend/
+    # https://www.geophysique.be/2011/01/27/matplotlib-basemap-tutorial-07-shapefiles-unleached/
+    map_data = gpd.read_file("map/ne_110m_admin_0_countries.shp")
+    alpha3_to_count = {c.country.alpha3.lower(): c.players_len for c in countries}
+
+    for index, row in map_data.iterrows():
+        alpha3: str = map_data.at[index, "ADM0_A3"].lower()
+        player_count = alpha3_to_count.pop(alpha3, None)
+        map_data.at[index, "VALUE"] = player_count or 0
+
+    assert not alpha3_to_count, f"Unable to map country to shape: {alpha3_to_count}"
+
+    fig, ax = plt.subplots(1, 1, figsize=(8, 8), layout="constrained")
+
+    players_len_max = max(c.players_len for c in countries)
+    norm = mcolors.Normalize(vmin=0, vmax=players_len_max)
+    cmap = load_cmap("Berry", cmap_type="continuous")
+
+    map_data.plot(
+        ax=ax,
+        column="VALUE",
+        cmap=cmap,
+        norm=norm,
+        edgecolor="black",
+        linewidth=0.2,
+    )
+
+    ax.set_ylim(-60, 90)  # Cut Antarctica
+    ax.axis("off")
+    ax.set_xmargin(0)
+    ax.set_ymargin(0)
+
+    data_projected = map_data.to_crs(epsg=3035)
+    data_projected["centroid"] = data_projected.geometry.centroid
+    map_data["centroid"] = data_projected["centroid"].to_crs(map_data.crs)
+
+    alpha3_to_label_adjustment = {
+        "fra": (10, 4),
+        "nor": (-5, -5),
+        "usa": (0, -5),
+        "can": (-10, -3),
+        "chl": (-5, 0),
+        "chn": (-2, -3),
+        "aus": (3, -2),
+    }
+
+    alpha3_to_count = {c.country.alpha3.lower(): c.players_len for c in countries}
+
+    for index, row in map_data.iterrows():
+        alpha3: str = map_data.at[index, "ADM0_A3"].lower()
+        player_count = alpha3_to_count.pop(alpha3, None)
+
+        if player_count is not None:
+            centroid = map_data.at[index, "centroid"]
+            x, y = centroid.coords[0]
+            dx, dy = alpha3_to_label_adjustment.get(alpha3, (0, 0))
+            x = x + dx
+            y = y + dy
+
+            ax.annotate(
+                str(player_count),
+                (x, y),
+                ha="center",
+                va="center",
+                fontsize=12,
+                color="black",
+            )
+
+    # display the plot
+    dpi = 100
+    width = 1400
+    aspect_width, aspect_height = 1400, 600
+
+    fig.set_dpi(dpi)
+    fig.set_figwidth(width / dpi)
+    fig.set_figheight(width * aspect_height / aspect_width / dpi)
+    fig.savefig("output/world.png")
+    plt.close(fig)
 
 
     _write_award_for_best_tally(

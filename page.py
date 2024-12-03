@@ -45,7 +45,7 @@ class Table:
         text: str
         is_player_column: bool = False
 
-    Value = Union[str | int | Player]
+    Value = Union[str | int | Player | None]
 
     class Row:
         def __init__(self, values: list["Table.Value"] | None = None) -> None:
