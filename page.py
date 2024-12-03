@@ -1,11 +1,15 @@
 import os
+import pandas as pd
+import geopandas as gpd
 import matplotlib.pyplot as plt
-from matplotlib.ticker import MultipleLocator
-from matplotlib.axes._axes import Axes
-from matplotlib.collections import Collection
-from typing import Literal, Union, Iterable, Sequence, assert_never
-from dataclasses import dataclass
+import matplotlib.colors as pltColors
+import matplotlib.ticker as pltTicker
+import matplotlib.figure as pltFigure
+import matplotlib.axes._axes as pltAxes
+import matplotlib.collections as pltCollections
 from pypalettes import load_cmap
+from typing import Any, Literal, Union, Iterable, Sequence, Hashable, assert_never
+from dataclasses import dataclass
 from atp_api import Player
 
 # MARK: Text
@@ -66,7 +70,7 @@ class Chart:
     "Single chart."
 
     class XAxis:
-        def __init__(self, ax: Axes) -> None:
+        def __init__(self, ax: pltAxes.Axes) -> None:
             self.ax = ax
             self.axis = self.ax.xaxis
             self.ax.set_xmargin(0)
@@ -77,13 +81,13 @@ class Chart:
             self.ax.set_xlabel(value)
 
         def set_major_ticks(self, value: int):
-            self.axis.set_major_locator(MultipleLocator(value))
+            self.axis.set_major_locator(pltTicker.MultipleLocator(value))
 
         def set_minor_ticks(self, value: int):
-            self.axis.set_minor_locator(MultipleLocator(value))
+            self.axis.set_minor_locator(pltTicker.MultipleLocator(value))
 
     class YAxis:
-        def __init__(self, ax: Axes) -> None:
+        def __init__(self, ax: pltAxes.Axes) -> None:
             self.ax = ax
             self.axis = self.ax.yaxis
             self.ax.set_ymargin(0)
@@ -92,21 +96,21 @@ class Chart:
             self.ax.set_ylabel(value)
 
         def set_major_ticks(self, value: int):
-            self.axis.set_major_locator(MultipleLocator(value))
+            self.axis.set_major_locator(pltTicker.MultipleLocator(value))
 
         def set_minor_ticks(self, value: int):
-            self.axis.set_minor_locator(MultipleLocator(value))
+            self.axis.set_minor_locator(pltTicker.MultipleLocator(value))
 
     def __init__(self) -> None:
         self.fig, self.ax = plt.subplots(layout="constrained")
         self.x_axis = Chart.XAxis(self.ax)
         self.y_axis = Chart.YAxis(self.ax)
-        self._aspect_rato: tuple[float, float] | None = None
+        self._aspect_rato: tuple[int, int] | None = None
 
     def set_title(self, value: str):
         self.ax.set_title(value)
 
-    def set_aspect_rato(self, width: float, height: float):
+    def set_aspect_rato(self, width: int, height: int):
         "Aspect_rato 2:1 means 200px:100px."
         self._aspect_rato = (width, height)
 
@@ -167,7 +171,7 @@ class Chart:
 
     @dataclass
     class Heatmap:
-        im: Collection
+        im: pltCollections.Collection
 
     def add_heatmap(
         self,
@@ -182,6 +186,7 @@ class Chart:
 
     def add_color_bar(self, heatmap: Heatmap, label: str | None = None):
         # https://python-graph-gallery.com/heatmap-for-timeseries-matplotlib/
+        assert isinstance(self.ax.figure, pltFigure.Figure | pltFigure.SubFigure)
         cb = self.ax.figure.colorbar(heatmap.im, ax=self.ax)
 
         if label is not None:
@@ -223,7 +228,7 @@ class MapData:
             self,
             data: gpd.GeoDataFrame,
             index: Hashable,
-            row: gpd.GeoSeries,
+            row: pd.Series,
         ) -> None:
             self.data = data
             self.index = index
@@ -248,7 +253,8 @@ class MapData:
         self.data[column_name] = centroid.to_crs(self.data.crs)
 
     def iter_rows(self) -> list[Row]:
-        return [MapData.Row(self.data, i, r) for i, r in self.data.iterrows()]
+        rows = self.data.iterrows()
+        return [MapData.Row(self.data, i, r) for i, r in rows]
 
 
 class Map:
@@ -283,7 +289,7 @@ class Map:
     def add_data(self, data: MapData, value_min: int | float, value_max: int | float):
         d = data.data
         cmap = load_cmap("Berry", cmap_type="continuous")
-        norm = mplColors.Normalize(vmin=value_min, vmax=value_max)
+        norm = pltColors.Normalize(vmin=value_min, vmax=value_max)
 
         d.plot(
             ax=self.ax,
@@ -300,7 +306,7 @@ class Map:
 
 def _write_img(
     path: str,
-    fig: mplFigure,
+    fig: pltFigure.Figure,
     width: int,
     aspect_rato: tuple[int, int] | None,
 ):
