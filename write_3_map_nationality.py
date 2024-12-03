@@ -1,8 +1,6 @@
-import pandas as pd
-import geopandas as gpd
 from typing import Iterable
 from dataclasses import dataclass
-from page import Page, Award, Table
+from page import Page, Subtitle, Award, Table, Map, MapData
 from atp_api import (
     Country,
     Continent,
@@ -58,54 +56,23 @@ def write_map_nationality(
     countries.sort(key=lambda c: c.players_len, reverse=True)
     continents.sort(key=lambda c: c.players_len, reverse=True)
 
-    # MARK: Map
+    page.add(Subtitle(f"Number of players per country"))
+    _write_map(page, countries)
 
-    import matplotlib.pyplot as plt
-    import matplotlib.cm as cm
-    import matplotlib.colors as mcolors
-    import matplotlib.patches as patches
-    from pypalettes import load_cmap
 
-    # Data
-    # https://www.naturalearthdata.com/downloads/110m-cultural-vectors/
-    # Tutorials
-    # https://python-graph-gallery.com/web-map-europe-with-color-by-country/
-    # https://python-graph-gallery.com/web-map-with-custom-legend/
-    # https://www.geophysique.be/2011/01/27/matplotlib-basemap-tutorial-07-shapefiles-unleached/
-    map_data = gpd.read_file("map/ne_110m_admin_0_countries.shp")
-    alpha3_to_count = {c.country.alpha3.lower(): c.players_len for c in countries}
+# MARK: Map
 
-    for index, row in map_data.iterrows():
-        alpha3: str = map_data.at[index, "ADM0_A3"].lower()
-        player_count = alpha3_to_count.pop(alpha3, None)
-        map_data.at[index, "VALUE"] = player_count or 0
 
-    assert not alpha3_to_count, f"Unable to map country to shape: {alpha3_to_count}"
+def _write_map(page: Page, countries: list[CountryPlayers]):
+    map = Map()
+    map.set_aspect_rato(1400, 600)
+    map.set_latitude_range(-60, 90)  # Cut Antarctica
+    page.add(map)
 
-    fig, ax = plt.subplots(1, 1, figsize=(8, 8), layout="constrained")
+    data = MapData("map/ne_110m_admin_0_countries.shp")
+    data.calculate_centroid("CENTROID")
 
-    players_len_max = max(c.players_len for c in countries)
-    norm = mcolors.Normalize(vmin=0, vmax=players_len_max)
-    cmap = load_cmap("Berry", cmap_type="continuous")
-
-    map_data.plot(
-        ax=ax,
-        column="VALUE",
-        cmap=cmap,
-        norm=norm,
-        edgecolor="black",
-        linewidth=0.2,
-    )
-
-    ax.set_ylim(-60, 90)  # Cut Antarctica
-    ax.axis("off")
-    ax.set_xmargin(0)
-    ax.set_ymargin(0)
-
-    data_projected = map_data.to_crs(epsg=3035)
-    data_projected["centroid"] = data_projected.geometry.centroid
-    map_data["centroid"] = data_projected["centroid"].to_crs(map_data.crs)
-
+    alpha3_to_country = {c.country.alpha3.lower(): c for c in countries}
     alpha3_to_label_adjustment = {
         "fra": (10, 4),
         "nor": (-5, -5),
@@ -116,51 +83,27 @@ def write_map_nationality(
         "aus": (3, -2),
     }
 
-    alpha3_to_count = {c.country.alpha3.lower(): c.players_len for c in countries}
+    for row in data.iter_rows():
+        alpha3: str = row["ADM0_A3"].lower()
+        country = alpha3_to_country.pop(alpha3, None)
 
-    for index, row in map_data.iterrows():
-        alpha3: str = map_data.at[index, "ADM0_A3"].lower()
-        player_count = alpha3_to_count.pop(alpha3, None)
+        players_len = country.players_len if country else 0
+        row["VALUE"] = players_len
 
-        if player_count is not None:
-            centroid = map_data.at[index, "centroid"]
+        if players_len != 0:
+            centroid = row["CENTROID"]
             x, y = centroid.coords[0]
             dx, dy = alpha3_to_label_adjustment.get(alpha3, (0, 0))
             x = x + dx
             y = y + dy
+            map.annotate(x, y, str(players_len))
 
-            ax.annotate(
-                str(player_count),
-                (x, y),
-                ha="center",
-                va="center",
-                fontsize=12,
-                color="black",
-            )
+    assert not alpha3_to_country, f"Unable to map country to shape: {alpha3_to_country}"
 
-    # display the plot
-    dpi = 100
-    width = 1400
-    aspect_width, aspect_height = 1400, 600
-
-    fig.set_dpi(dpi)
-    fig.set_figwidth(width / dpi)
-    fig.set_figheight(width * aspect_height / aspect_width / dpi)
-    fig.savefig("output/world.png")
-    plt.close(fig)
+    players_len_max = max(c.players_len for c in countries)
+    map.add_data(data, value_min=0, value_max=players_len_max)
 
 
-    _write_award_for_best_tally(
-        page,
-        countries,
-        award_count_best_countries,
-    )
-
-    _write_awards_for_best_in_continent(
-        page,
-        players,
-        award_count_best_player_per_continent,
-    )
 
 
 # MARK: Awards

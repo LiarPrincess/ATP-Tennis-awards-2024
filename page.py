@@ -202,20 +202,123 @@ class Chart:
         return value_to_color
 
     def write_img(self, path: str, *, width: int):
-        dpi = 100
-        self.fig.set_dpi(dpi)
-        self.fig.set_figwidth(width / dpi)
+        _write_img(path, self.fig, width, self._aspect_rato)
 
-        if self._aspect_rato is not None:
-            # Aspect_rato 2:1 means 200px:100px, proportions
-            # width  | aspect_width
-            # height | aspect_height
-            as_width, as_height = self._aspect_rato
-            height = width * as_height / as_width
-            self.fig.set_figheight(height / dpi)
 
-        self.fig.savefig(path)
-        plt.close(self.fig)
+# MARK: Map
+
+# Data
+# https://www.naturalearthdata.com/downloads/110m-cultural-vectors/
+#
+# Tutorials
+# https://python-graph-gallery.com/web-map-europe-with-color-by-country/
+# https://python-graph-gallery.com/web-map-with-custom-legend/
+# https://www.geophysique.be/2011/01/27/matplotlib-basemap-tutorial-07-shapefiles-unleached/
+
+
+class MapData:
+
+    class Row:
+        def __init__(
+            self,
+            data: gpd.GeoDataFrame,
+            index: Hashable,
+            row: gpd.GeoSeries,
+        ) -> None:
+            self.data = data
+            self.index = index
+            self.row = row
+
+        def __getitem__(self, name: str) -> Any:
+            return self.data.at[self.index, name]
+
+        def __setitem__(self, name: str, value: Any) -> None:
+            self.data.at[self.index, name] = value
+
+    def __init__(self, shp_path: str) -> None:
+        data = gpd.read_file(shp_path)
+        assert isinstance(data, gpd.GeoDataFrame)
+        self.data = data
+
+    def calculate_centroid(self, column_name: str):
+        proj = self.data.to_crs(epsg=3035)
+        assert isinstance(proj, gpd.GeoDataFrame)
+        centroid = proj.geometry.centroid
+        assert isinstance(centroid, gpd.GeoSeries)
+        self.data[column_name] = centroid.to_crs(self.data.crs)
+
+    def iter_rows(self) -> list[Row]:
+        return [MapData.Row(self.data, i, r) for i, r in self.data.iterrows()]
+
+
+class Map:
+
+    def __init__(self) -> None:
+        self.fig, self.ax = plt.subplots(layout="constrained")
+        self.ax.axis("off")
+        self.ax.set_xmargin(0)
+        self.ax.set_ymargin(0)
+        self._aspect_rato: tuple[int, int] | None = None
+
+    def set_aspect_rato(self, width: int, height: int):
+        "Aspect_rato 2:1 means 200px:100px."
+        self._aspect_rato = (width, height)
+
+    def set_longitude_range(self, east: float, west: float):
+        self.ax.set_xlim(east, west)
+
+    def set_latitude_range(self, south: float, north: float):
+        self.ax.set_ylim(south, north)
+
+    def annotate(self, x: float, y: float, s: str):
+        self.ax.annotate(
+            s,
+            (x, y),
+            ha="center",
+            va="center",
+            fontsize=12,
+            color="black",
+        )
+
+    def add_data(self, data: MapData, value_min: int | float, value_max: int | float):
+        d = data.data
+        cmap = load_cmap("Berry", cmap_type="continuous")
+        norm = mplColors.Normalize(vmin=value_min, vmax=value_max)
+
+        d.plot(
+            ax=self.ax,
+            column="VALUE",
+            cmap=cmap,
+            norm=norm,
+            edgecolor="black",
+            linewidth=0.2,
+        )
+
+    def write_img(self, path: str, *, width: int):
+        _write_img(path, self.fig, width, None)
+
+
+def _write_img(
+    path: str,
+    fig: mplFigure,
+    width: int,
+    aspect_rato: tuple[int, int] | None,
+):
+
+    dpi = 100
+    fig.set_dpi(dpi)
+    fig.set_figwidth(width / dpi)
+
+    if aspect_rato is not None:
+        # Aspect_rato 2:1 means 200px:100px, proportions
+        # width  | aspect_width
+        # height | aspect_height
+        a_width, a_height = aspect_rato
+        height = width * a_height / a_width
+        fig.set_figheight(height / dpi)
+
+    fig.savefig(path)
+    plt.close(fig)
 
 
 # MARK: Page
@@ -224,7 +327,7 @@ class Chart:
 class Page:
 
     # ChartElements = Union[BarChart, MirrorBarChart]
-    Element = Union[Title, Subtitle, Paragraph, Award, Space, Table, Chart]
+    Element = Union[Title, Subtitle, Paragraph, Award, Space, Table, Chart, Map]
 
     def __init__(self) -> None:
         self._elements = list[Page.Element]()
@@ -276,6 +379,8 @@ class Page:
                             values.append(
                                 f"{rank_pad}{v.rank} {flag} {v.name_first} {v.name_last}"
                             )
+                        elif v is None:
+                            values.append("")
                         else:
                             assert_never(v)
 
@@ -284,7 +389,7 @@ class Page:
                 joined = "\n".join(lines)
                 elements_html.append(joined)
 
-            elif isinstance(e, Chart):
+            elif isinstance(e, Chart | Map):
                 e_name = f"{path_name_without_extension}_chart_{chart_index}.png"
                 e_path = os.path.join(path_dir, e_name)
                 chart_index += 1
