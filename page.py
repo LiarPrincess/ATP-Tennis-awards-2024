@@ -298,10 +298,11 @@ class Map:
             norm=norm,
             edgecolor="black",
             linewidth=0.2,
+            legend=True,
         )
 
     def write_img(self, path: str, *, width: int):
-        _write_img(path, self.fig, width, None)
+        _write_img(path, self.fig, width, self._aspect_rato)
 
 
 def _write_img(

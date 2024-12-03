@@ -6,7 +6,7 @@ from write_1_ranking_volatility import write_ranking_volatility
 from write_2_gsm_versus import write_game_set_match_versus
 from write_2_gsm_game_count import write_game_set_match_game_count
 from write_2_gsm_highest_defeated import write_game_set_match_highest_defeated
-from write_3_map_nationality import write_map_nationality
+from write_3_map import write_map
 
 _PLAYER_COUNT = 50
 # Day has to be one of the days the ranking is published.
@@ -89,14 +89,12 @@ def main():
     page = Page()
     page.add(Title("Geography"))
 
-    write_map_nationality(
+    write_map(
         page,
         players,
-        award_count_best_countries=3,
+        award_count_best_countries=4,
         award_count_best_player_per_continent=5,
     )
-
-    # Residence vs nationality?
 
     _write(page, "3_map.md")
 

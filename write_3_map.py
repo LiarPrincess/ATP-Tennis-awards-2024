@@ -31,7 +31,7 @@ class ContinentPlayers:
         return len(self.players)
 
 
-def write_map_nationality(
+def write_map(
     page: Page,
     players: list[Player],
     award_count_best_countries: int,
@@ -81,7 +81,7 @@ def write_map_nationality(
 
 def _write_map(page: Page, countries: list[CountryPlayers]):
     map = Map()
-    map.set_aspect_rato(1400, 600)
+    map.set_aspect_rato(1400, 550)
     map.set_latitude_range(-60, 90)  # Cut Antarctica
     page.add(map)
 
