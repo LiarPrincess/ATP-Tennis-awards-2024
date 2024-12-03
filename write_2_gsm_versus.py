@@ -55,70 +55,56 @@ def write_game_set_match_versus(
 ):
     "Matrix who played with who."
 
-    # MARK: Data
-
-    rows = list[_Row]()
-    id_to_player = {p.id: p for p in players}
-    rank_lowest: int | None = None
-    rank_highest: int | None = None
-
-    for p in players:
-        p_rank = p.rank
-        assert p_rank is not None
-        row = _Row(p, p_rank, [], [], 0, 0)
-        rows.append(row)
-
-        rank_lowest = max2(rank_lowest, p_rank)
-        rank_highest = min2(rank_highest, p_rank)
-
-        for t in p.career_tournaments:
-            if t.date < date_from:
-                continue
-
-            for m in t.matches:
-                if isinstance(m, _Row.MatchData):
-                    o_id = m.opponent.id
-                    o = id_to_player.get(o_id)
-
-                    # None -> player not in the top 10/50/100 etc.
-                    if o is not None:
-                        assert o.rank is not None
-                        match = _Row.Match(t, m, o, o.rank)
-                        row.matches.append(match)
-
-                        if o.rank <= top_N:
-                            row.matches_against_top_N.append(match)
-
-                            if m.win_loss == "W":
-                                row.matches_against_top_N_win_count += 1
-                            elif m.win_loss == "L":
-                                row.matches_against_top_N_loss_count += 1
-                            else:
-                                assert_never(m.win_loss)
-
-                elif isinstance(m, PlayerMatch_Bye | PlayerMatch_NotPlayed):
-                    pass
-                else:
-                    assert_never(m)
-
-    assert rank_lowest is not None
-    assert rank_highest is not None
-    rank_span = rank_lowest - rank_highest + 1
-
-    # MARK: Chart
-
     date_from_short = substring_until(date_from, "T")
     page.add(Subtitle(f"Match count since {date_from_short}"))
+
     page.add(
         Paragraph(
             "All games, including Olympics etc. Only singles (as in 1 on 1 matches, not their marriage status)."
         )
     )
 
+    rows = _get_rows(players, date_from, top_N)
+    _write_chart(page, rows)
+
+    page.add(
+        Paragraph(
+            f"Top {top_N} plays with each other very often, so we separated the awards."
+        )
+    )
+
+    _write_luckiest_award(
+        page=page,
+        rows=rows,
+        top_N=top_N,
+    )
+
+    _write_unluckiest_award(
+        page=page,
+        rows=rows,
+        top_N=top_N,
+        award_count=award_count_unluckiest,
+    )
+
+    _write_lovebirds_award(
+        page=page,
+        rows=rows,
+        top_N=top_N,
+    )
+
+
+# MARK: Chart
+
+
+def _write_chart(page: Page, rows: list[_Row]):
     chart = Chart()
     chart.set_show_grid(True)
-    chart.set_aspect_rato(1.2, 1)
+    chart.set_aspect_rato(12, 10)
     page.add(chart)
+
+    rank_lowest = max(r.player_rank for r in rows)
+    rank_highest = min(r.player_rank for r in rows)
+    rank_span = rank_lowest - rank_highest + 1
 
     chart_data = [[0] * rank_span for _ in range(rank_span)]
 
@@ -145,33 +131,6 @@ def write_game_set_match_versus(
     y_axis.set_label("Opponent rank")
     chart.y_axis.set_major_ticks(5)
     chart.y_axis.set_minor_ticks(1)
-
-    # MARK: Awards
-
-    page.add(
-        Paragraph(
-            f"Top {top_N} plays with each other very often, so we separated the awards."
-        )
-    )
-
-    _write_luckiest_award(
-        page=page,
-        rows=rows,
-        top_N=top_N,
-    )
-
-    _write_unluckiest_award(
-        page=page,
-        rows=rows,
-        top_N=top_N,
-        award_count=award_count_unluckiest,
-    )
-
-    _write_lovebirds_award(
-        page=page,
-        rows=rows,
-        top_N=top_N,
-    )
 
 
 # MARK: Awards
@@ -406,6 +365,54 @@ def _write_lovebirds_award(
             page.add(
                 Paragraph(f"We hope they created a lot of happy memories together!")
             )
+
+
+# MARK: Rows
+
+
+def _get_rows(players: list[Player], date_from: str, top_N: int) -> list[_Row]:
+    result = list[_Row]()
+    id_to_player = {p.id: p for p in players}
+
+    for p in players:
+        p_rank = p.rank
+        assert p_rank is not None
+        row = _Row(p, p_rank, [], [], 0, 0)
+        result.append(row)
+
+        for t in p.career_tournaments:
+            if t.date < date_from:
+                continue
+
+            for m in t.matches:
+                if isinstance(m, _Row.MatchData):
+                    o_id = m.opponent.id
+                    o = id_to_player.get(o_id)
+
+                    # None -> player not in the top 10/50/100 etc.
+                    if o is None:
+                        continue
+
+                    assert o.rank is not None
+                    match = _Row.Match(t, m, o, o.rank)
+                    row.matches.append(match)
+
+                    if o.rank <= top_N:
+                        row.matches_against_top_N.append(match)
+
+                        if m.win_loss == "W":
+                            row.matches_against_top_N_win_count += 1
+                        elif m.win_loss == "L":
+                            row.matches_against_top_N_loss_count += 1
+                        else:
+                            assert_never(m.win_loss)
+
+                elif isinstance(m, PlayerMatch_Bye | PlayerMatch_NotPlayed):
+                    pass
+                else:
+                    assert_never(m)
+
+    return result
 
 
 # MARK: Helpers

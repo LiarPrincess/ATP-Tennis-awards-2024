@@ -24,12 +24,13 @@ def write_ranking_change(
     past_ranking: list[Player],
     now_date: str,
     now_ranking: list[Player],
-    award_count_raise: int,
-    award_count_drop: int,
+    award_count: int,
 ):
     "Compare current rank with the rank in the past."
 
-    # MARK: Data
+    past_date_short = substring_until(past_date, "T")
+    now_date_short = substring_until(now_date, "T")
+    page.add(Subtitle(f"Rank change since {past_date_short}"))
 
     rows = _get_rows(
         now_ranking,
@@ -43,14 +44,19 @@ def write_ranking_change(
         on_current_rank_none="ignore",
     )
 
-    rows_sorted_by_diff = sorted(rows, key=lambda r: r.diff)
+    _write_chart(page, rows)
 
-    # MARK: Chart
+    _write_awards(
+        page,
+        past_date_short=past_date_short,
+        past_rows=rows_past,
+        now_date_short=now_date_short,
+        now_rows=rows,
+        award_count=award_count,
+    )
 
-    past_date_short = substring_until(past_date, "T")
-    now_date_short = substring_until(now_date, "T")
-    page.add(Subtitle(f"Rank change since {past_date_short}"))
 
+def _write_chart(page: Page, rows: list[_Row]):
     chart = Chart()
     chart.set_show_grid(True)
     page.add(chart)
@@ -70,12 +76,20 @@ def write_ranking_change(
     y_axis.set_label("Positions gained/lost")
 
     tick_count = 20
-    min_diff = rows_sorted_by_diff[0].diff
-    max_diff = rows_sorted_by_diff[-1].diff
+    min_diff = min(r.diff for r in rows)
+    max_diff = max(r.diff for r in rows)
     spread = max_diff - min_diff
     y_axis.set_major_ticks(round_down(spread // tick_count, multiple_of=10))
 
-    # MARK: Awards
+
+def _write_awards(
+    page: Page,
+    past_date_short: str,
+    past_rows: list[_Row],
+    now_date_short: str,
+    now_rows: list[_Row],
+    award_count: int,
+):
 
     def add_award(emoji: str, text: str, rows: list[_Row]):
         table = Table()
@@ -97,8 +111,8 @@ def write_ranking_change(
 
     # Biggest raise
     award_rows = filter_award_max(
-        rows,
-        count=award_count_raise,
+        now_rows,
+        count=award_count,
         key=lambda r: r.diff,
     )
     award_rows = [r for r in award_rows if r.diff > 0]  # Only positive
@@ -110,19 +124,16 @@ def write_ranking_change(
 
     # Biggest drop
     award_rows: list[_Row] = filter_award_min(
-        rows_past,
-        count=award_count_drop,
+        past_rows,
+        count=award_count,
         key=lambda r: r.diff,
     )
     award_rows = [r for r in award_rows if r.diff < 0]  # Only negative
     add_award("🦨", "Skunk award for the biggest drop.", award_rows)
 
     # No change
-    award_rows = filter_award_equal(rows, key=lambda r: r.diff == 0)
+    award_rows = filter_award_equal(now_rows, key=lambda r: r.diff == 0)
     add_award("🦥", "Sloth award for sleeping the whole season.", award_rows)
-
-
-# MARK: Helpers
 
 
 def _get_rows(

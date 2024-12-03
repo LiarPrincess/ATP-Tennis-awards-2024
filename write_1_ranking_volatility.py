@@ -36,51 +36,15 @@ def write_ranking_volatility(
 ):
     "Compare rank fluctuation."
 
-    # MARK: Data
-
-    rows = list[_Row]()
-
-    for p in players:
-        ranks = [r for r in p.career_rank_history if r.date >= date_from]
-        ranks.sort(key=lambda r: r.date)
-        assert ranks
-
-        lowest_rank = -9999
-        highest_rank = 9999
-        max_rank_increase = -9999
-        max_rank_drop = 9999
-        previous_rank = None
-
-        for r in ranks:
-            # Smaller number -> higher rank
-            lowest_rank = max(lowest_rank, r.rank)
-            highest_rank = min(highest_rank, r.rank)
-
-            if previous_rank is not None:
-                diff = previous_rank.rank - r.rank
-                max_rank_increase = max(max_rank_increase, diff)
-                max_rank_drop = min(max_rank_drop, diff)
-
-            previous_rank = r
-
-        current_rank = p.rank
-        assert current_rank is not None
-
-        rows.append(
-            _Row(
-                p,
-                current_rank,
-                highest_rank,
-                lowest_rank,
-                max_rank_increase,
-                max_rank_drop,
-            )
-        )
-
-    # MARK: Chart
-
     date_from_short = substring_until(date_from, "T")
     page.add(Subtitle(f"Rank spread since {date_from_short}"))
+
+    rows = _get_rows(players, date_from)
+    _write_chart(page, rows)
+    _write_awards(page, rows, award_count_min_spread, award_count_max_spread)
+
+
+def _write_chart(page: Page, rows: list[_Row]):
 
     chart = Chart()
     chart.set_show_grid(True)
@@ -107,7 +71,13 @@ def write_ranking_volatility(
     spread = max(r.lowest_rank for r in rows)
     y_axis.set_major_ticks(round_down(spread // tick_count, multiple_of=10))
 
-    # MARK: Awards
+
+def _write_awards(
+    page: Page,
+    rows: list[_Row],
+    award_count_min_spread: int,
+    award_count_max_spread: int,
+):
 
     def add_award(emoji: str, text: str, rows: list[_Row]):
         table = Table()
@@ -150,3 +120,46 @@ def write_ranking_volatility(
         "Bunny award for those who like to hop around.",
         award_rows,
     )
+
+
+def _get_rows(players: list[Player], date_from: str) -> list[_Row]:
+    result = list[_Row]()
+
+    for p in players:
+        ranks = [r for r in p.career_rank_history if r.date >= date_from]
+        ranks.sort(key=lambda r: r.date)
+        assert ranks
+
+        lowest_rank = -9999
+        highest_rank = 9999
+        max_rank_increase = -9999
+        max_rank_drop = 9999
+        previous_rank = None
+
+        for r in ranks:
+            # Smaller number -> higher rank
+            lowest_rank = max(lowest_rank, r.rank)
+            highest_rank = min(highest_rank, r.rank)
+
+            if previous_rank is not None:
+                diff = previous_rank.rank - r.rank
+                max_rank_increase = max(max_rank_increase, diff)
+                max_rank_drop = min(max_rank_drop, diff)
+
+            previous_rank = r
+
+        current_rank = p.rank
+        assert current_rank is not None
+
+        result.append(
+            _Row(
+                p,
+                current_rank,
+                highest_rank,
+                lowest_rank,
+                max_rank_increase,
+                max_rank_drop,
+            )
+        )
+
+    return result

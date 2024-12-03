@@ -40,63 +40,15 @@ def write_game_set_match_game_count(
 ):
     "Game count."
 
-    # MARK: Data
-
-    rows = list[_Row]()
-
-    for p in players:
-        p_rank = p.rank
-        assert p_rank is not None
-        row = _Row(p, p_rank, 0, 0, 0, 0)
-        rows.append(row)
-
-        for t in p.career_tournaments:
-            if t.date < date_from:
-                continue
-
-            for m in t.matches:
-                if isinstance(
-                    m,
-                    PlayerMatch_Played | PlayerMatch_Retire | PlayerMatch_Default,
-                ):
-                    for s in m.sets:
-                        row.game_win_count += s.player
-                        row.game_lost_count += s.opponent
-
-                        if s.tie_break is not None:
-                            # 7:6
-                            if s.player == 7:
-                                assert s.opponent == 6
-                                row.game_win_count -= 1
-                                row.game_win_tie_break_count += 1
-                            elif s.opponent == 7:
-                                assert s.player == 6
-                                row.game_lost_count -= 1
-                                row.game_lost_tie_break_count += 1
-                            # 1:0
-                            elif s.player == 1:
-                                assert s.opponent == 0
-                                row.game_win_tie_break_count += 1
-                            elif s.opponent == 1:
-                                assert s.player == 0
-                                row.game_lost_tie_break_count += 1
-                            else:
-                                assert False, "Tie-break requires 7:6 or 1:0"
-
-                elif isinstance(
-                    m, PlayerMatch_Bye | PlayerMatch_NotPlayed | PlayerMatch_Walkover
-                ):
-                    pass
-                else:
-                    assert_never(m)
-
-                pass
-
-    # MARK: Chart
-
     date_from_short = substring_until(date_from, "T")
     page.add(Subtitle(f"Number of games since {date_from_short}"))
 
+    rows = _get_rows(players, date_from)
+    _write_chart(page, rows)
+    _write_awards(page, rows, award_count)
+
+
+def _write_chart(page: Page, rows: list[_Row]):
     chart = Chart()
     chart.set_show_grid(True)
     page.add(chart)
@@ -134,7 +86,8 @@ def write_game_set_match_game_count(
     spread = max(r.count_all for r in rows)
     y_axis.set_major_ticks(round_down(spread // tick_count, multiple_of=10))
 
-    # MARK: Awards
+
+def _write_awards(page: Page, rows: list[_Row], award_count: int):
 
     def add_award(emoji: str, text: str, rows: list[_Row]):
         table = Table()
@@ -189,3 +142,57 @@ def write_game_set_match_game_count(
         "Koala award for the least games played.",
         award_rows,
     )
+
+
+def _get_rows(players: list[Player], date_from: str) -> list[_Row]:
+    result = list[_Row]()
+
+    for p in players:
+        p_rank = p.rank
+        assert p_rank is not None
+        row = _Row(p, p_rank, 0, 0, 0, 0)
+        result.append(row)
+
+        for t in p.career_tournaments:
+            if t.date < date_from:
+                continue
+
+            for m in t.matches:
+                if isinstance(
+                    m,
+                    PlayerMatch_Played | PlayerMatch_Retire | PlayerMatch_Default,
+                ):
+                    for s in m.sets:
+                        row.game_win_count += s.player
+                        row.game_lost_count += s.opponent
+
+                        if s.tie_break is not None:
+                            # 7:6
+                            if s.player == 7:
+                                assert s.opponent == 6
+                                row.game_win_count -= 1
+                                row.game_win_tie_break_count += 1
+                            elif s.opponent == 7:
+                                assert s.player == 6
+                                row.game_lost_count -= 1
+                                row.game_lost_tie_break_count += 1
+                            # 1:0
+                            elif s.player == 1:
+                                assert s.opponent == 0
+                                row.game_win_tie_break_count += 1
+                            elif s.opponent == 1:
+                                assert s.player == 0
+                                row.game_lost_tie_break_count += 1
+                            else:
+                                assert False, "Tie-break requires 7:6 or 1:0"
+
+                elif isinstance(
+                    m,
+                    PlayerMatch_Bye | PlayerMatch_NotPlayed | PlayerMatch_Walkover,
+                ):
+                    pass
+
+                else:
+                    assert_never(m)
+
+    return result
