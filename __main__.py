@@ -7,6 +7,7 @@ from write_2_gsm_versus import write_game_set_match_versus
 from write_2_gsm_game_count import write_game_set_match_game_count
 from write_2_gsm_highest_defeated import write_game_set_match_highest_defeated
 from write_3_map import write_map
+from write_4_body import write_body_stats
 
 _PLAYER_COUNT = 50
 # Day has to be one of the days the ranking is published.
@@ -15,6 +16,7 @@ _RANKING_NOW_DAY = "2024-11-25"
 _RANKING_PAST_DAY = "2024-01-01"
 _RANKING_NOW_DATE = f"{_RANKING_NOW_DAY}T00:00:00"
 _RANKING_PAST_DATE = f"{_RANKING_PAST_DAY}T00:00:00"
+_OUTPUT_DIR_PATH = "output"
 
 
 def main():
@@ -96,11 +98,18 @@ def main():
         award_count_best_player_per_continent=5,
     )
 
-    _write(page, "3_map.md")
+    page = Page()
+    page.add(Title("Body"))
 
-    # MARK: Fin
+    write_body_stats(
+        page,
+        players,
+        award_count_age=5,
+        award_count_height=3,
+        award_count_weight=3,
+    )
 
-    print("Before publishing please DELETE CACHE and generate again.")
+    _write(page, file_name)
 
 
 # MARK: Helpers

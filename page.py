@@ -86,6 +86,9 @@ class Chart:
         def set_minor_ticks(self, value: int):
             self.axis.set_minor_locator(pltTicker.MultipleLocator(value))
 
+        def set_range(self, min: int | float, max: int | float):
+            self.ax.set_xlim(min, max)
+
     class YAxis:
         def __init__(self, ax: pltAxes.Axes) -> None:
             self.ax = ax
@@ -100,6 +103,9 @@ class Chart:
 
         def set_minor_ticks(self, value: int):
             self.axis.set_minor_locator(pltTicker.MultipleLocator(value))
+
+        def set_range(self, min: int | float, max: int | float):
+            self.ax.set_ylim(min, max)
 
     def __init__(self) -> None:
         self.fig, self.ax = plt.subplots(layout="constrained")
@@ -192,12 +198,47 @@ class Chart:
         if label is not None:
             cb.ax.set_ylabel(label)
 
+    def add_horizontal_line(
+        self,
+        y: int | float,
+        x_start: int | float,
+        x_end: int | float,
+        /,
+        color: Literal["black", "red"] = "black",
+        line_width: int = 2,
+    ):
+        self.ax.hlines(
+            y,
+            x_start,
+            x_end,
+            colors=color,
+            linewidth=line_width,
+        )
+
+    def add_vertical_line(
+        self,
+        x: int | float,
+        y_start: int | float,
+        y_end: int | float,
+        /,
+        color: Literal["black", "red"] = "black",
+        line_width: int = 2,
+    ):
+        self.ax.vlines(
+            x,
+            y_start,
+            y_end,
+            colors=color,
+            linewidth=line_width,
+        )
+
     def create_color_map(
         self, values: Iterable[int | float]
     ) -> dict[int | float, RGBA]:
-        value_to_color = dict[int | float, Chart.RGBA]()
-        values_sorted = sorted(values)
+        values_sorted = sorted(set(values))
         values_len = len(values_sorted)
+
+        value_to_color = dict[int | float, Chart.RGBA]()
         cmap = load_cmap("Berry", cmap_type="continuous")
 
         for i, value in enumerate(values_sorted):
