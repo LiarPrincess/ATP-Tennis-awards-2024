@@ -85,7 +85,7 @@ def _write_map(page: Page, countries: list[CountryPlayers]):
     map.set_latitude_range(-60, 90)  # Cut Antarctica
     page.add(map)
 
-    data = MapData("map/ne_110m_admin_0_countries.shp")
+    data = MapData("assets/ne_110m_admin_0_countries.shp")
     data.calculate_centroid("CENTROID")
 
     alpha3_to_country = {c.country.alpha3.lower(): c for c in countries}
