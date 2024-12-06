@@ -3,7 +3,7 @@ from dataclasses import dataclass
 from browser import get_html_browser
 from atp.helpers import REQUEST_INTERVAL_SECONDS
 
-CACHE_PATH = "cache/atp_ranking"
+CACHE_PATH = "atp_cache/atp_ranking"
 
 
 @dataclass

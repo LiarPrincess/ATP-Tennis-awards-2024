@@ -1,7 +1,7 @@
 from atp.json_dict import JSONDict
 from atp.helpers import create_urls, get_json
 
-CACHE_PATH = "cache/atp_player_stats"
+CACHE_PATH = "atp_cache/atp_player_stats"
 
 
 class PlayerStats_Service:

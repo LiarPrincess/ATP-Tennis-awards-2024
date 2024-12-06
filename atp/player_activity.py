@@ -3,7 +3,7 @@ from dataclasses import dataclass
 from atp.json_dict import JSONDict
 from atp.helpers import create_urls, get_json_or_none
 
-CACHE_PATH = "cache/atp_player_activity"
+CACHE_PATH = "atp_cache/atp_player_activity"
 
 
 # MARK: Tournament

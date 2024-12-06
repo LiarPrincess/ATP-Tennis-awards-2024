@@ -3,7 +3,7 @@ from atp.json_dict import JSONDict
 from atp.helpers import create_urls, get_json
 from atp.countries import get_country_by_ioc_code
 
-CACHE_PATH = "cache/atp_player_data"
+CACHE_PATH = "atp_cache/atp_player_data"
 
 
 # MARK: Player
