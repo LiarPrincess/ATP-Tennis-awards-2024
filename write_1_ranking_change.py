@@ -118,7 +118,7 @@ def _write_awards(
     award_rows = [r for r in award_rows if r.diff > 0]  # Only positive
     add_award(
         "🦄",
-        "Unicorn award for the biggest raise. This is THE award to get, possibly more important than #1.",
+        "Unicorn award for the biggest raise. This may be the 2nd most important award this season, because year end #1 is THE most important one.",
         award_rows,
     )
 
@@ -133,7 +133,7 @@ def _write_awards(
 
     # No change
     award_rows = filter_award_equal(now_rows, key=lambda r: r.diff == 0)
-    add_award("🦥", "Sloth award for sleeping the whole season.", award_rows)
+    add_award("🦥", "Sloth award for… hanging in there.", award_rows)
 
 
 def _get_rows(

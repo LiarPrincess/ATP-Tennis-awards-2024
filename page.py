@@ -2,15 +2,27 @@ import os
 import pandas as pd
 import geopandas as gpd
 import matplotlib.pyplot as plt
+import matplotlib.axis as pltAxis
+import matplotlib.axes as pltAxes
 import matplotlib.colors as pltColors
 import matplotlib.ticker as pltTicker
 import matplotlib.figure as pltFigure
-import matplotlib.axes._axes as pltAxes
 import matplotlib.collections as pltCollections
 from pypalettes import load_cmap
-from typing import Any, Literal, Union, Iterable, Sequence, Hashable, assert_never
+from typing import (
+    Any,
+    Literal,
+    Union,
+    Iterable,
+    Sequence,
+    Hashable,
+    Callable,
+    assert_never,
+)
 from dataclasses import dataclass
 from atp_api import Player
+
+
 
 # MARK: Text
 
@@ -69,10 +81,25 @@ class Table:
 class Chart:
     "Single chart."
 
-    class XAxis:
-        def __init__(self, ax: pltAxes.Axes) -> None:
+    class _AxisBase:
+
+        def __init__(self, ax: pltAxes.Axes, axis: pltAxis.Axis) -> None:
             self.ax = ax
-            self.axis = self.ax.xaxis
+            self.axis = axis
+
+        def set_major_ticks(self, value: int):
+            self.axis.set_major_locator(pltTicker.MultipleLocator(value))
+
+        def set_major_formatter_fn(self, fn: Callable[[float, Any], str]):
+            fmt = pltTicker.FuncFormatter(fn)
+            self.axis.set_major_formatter(fmt)
+
+        def set_minor_ticks(self, value: int):
+            self.axis.set_minor_locator(pltTicker.MultipleLocator(value))
+
+    class XAxis(_AxisBase):
+        def __init__(self, ax: pltAxes.Axes) -> None:
+            super().__init__(ax, ax.xaxis)
             self.ax.set_xmargin(0)
             self.set_major_ticks(5)
             self.set_minor_ticks(1)
@@ -80,29 +107,16 @@ class Chart:
         def set_label(self, value: str):
             self.ax.set_xlabel(value)
 
-        def set_major_ticks(self, value: int):
-            self.axis.set_major_locator(pltTicker.MultipleLocator(value))
-
-        def set_minor_ticks(self, value: int):
-            self.axis.set_minor_locator(pltTicker.MultipleLocator(value))
-
         def set_range(self, min: int | float, max: int | float):
             self.ax.set_xlim(min, max)
 
-    class YAxis:
+    class YAxis(_AxisBase):
         def __init__(self, ax: pltAxes.Axes) -> None:
-            self.ax = ax
-            self.axis = self.ax.yaxis
+            super().__init__(ax, ax.yaxis)
             self.ax.set_ymargin(0)
 
         def set_label(self, value: str):
             self.ax.set_ylabel(value)
-
-        def set_major_ticks(self, value: int):
-            self.axis.set_major_locator(pltTicker.MultipleLocator(value))
-
-        def set_minor_ticks(self, value: int):
-            self.axis.set_minor_locator(pltTicker.MultipleLocator(value))
 
         def set_range(self, min: int | float, max: int | float):
             self.ax.set_ylim(min, max)
@@ -145,6 +159,16 @@ class Chart:
     ):
         self.ax.bar(x, height, bottom=bottom, color=color)
 
+    def add_plot(
+        self,
+        x,
+        y,
+        label: str | None = None,
+        color: Literal["black"] | None = None,
+        line_width: int | None = None,
+    ):
+        self.ax.plot(x, y, label=label, color=color, linewidth=line_width)
+
     # https://matplotlib.org/stable/api/markers_api.html
     ScatterMarker = Literal[
         ".", "o", "v", "^", "<", ">", "s", "p", "P", "*", "+", "x", "X", "D", "|", "_"
@@ -172,8 +196,11 @@ class Chart:
     ):
         self.ax.scatter(x, y, s=size, c=color, marker=marker)
 
-    def add_legend(self, entries: list[str]):
-        self.fig.legend(entries)
+    def add_legend(self, entries: list[str] | None = None):
+        if entries is None:
+            self.fig.legend()
+        else:
+            self.fig.legend(entries)
 
     @dataclass
     class Heatmap:
@@ -204,6 +231,7 @@ class Chart:
         x_start: int | float,
         x_end: int | float,
         /,
+        label: str = "",
         color: Literal["black", "red"] = "black",
         line_width: int = 2,
     ):
@@ -211,6 +239,7 @@ class Chart:
             y,
             x_start,
             x_end,
+            label=label,
             colors=color,
             linewidth=line_width,
         )

@@ -9,6 +9,9 @@ class PlayerStats_Service:
         self.aces = json.get_int("Aces")
         self.double_faults = json.get_int("DoubleFaults")
 
+        self.games_played = json.get_int("ServiceGamesPlayed")
+        self.games_won_percentage = json.get_int("ServiceGamesWonPercentage")
+
         self.first_serve_percentage = json.get_int("FirstServePercentage")
         self.first_serve_points_won_percentage = json.get_int(
             "FirstServePointsWonPercentage"
@@ -20,9 +23,7 @@ class PlayerStats_Service:
         self.break_points_faced = json.get_int("BreakPointsFaced")
         self.break_points_saved_percentage = json.get_int("BreakPointsSavedPercentage")
 
-        self.service_games_played = json.get_int("ServiceGamesPlayed")
-        self.service_games_won_percentage = json.get_int("ServiceGamesWonPercentage")
-        self.service_points_won_percentage = json.get_int("ServicePointsWonPercentage")
+        self.points_won_percentage = json.get_int("ServicePointsWonPercentage")
 
 
 class PlayerStats_Return:
@@ -39,9 +40,9 @@ class PlayerStats_Return:
             "BreakPointsConvertedPercentage"
         )
 
-        self.return_games_played = json.get_int("ReturnGamesPlayed")
-        self.return_games_won_percentage = json.get_int("ReturnGamesWonPercentage")
-        self.return_points_won_percentage = json.get_int("ReturnPointsWonPercentage")
+        self.games_played = json.get_int("ReturnGamesPlayed")
+        self.games_won_percentage = json.get_int("ReturnGamesWonPercentage")
+        self.points_won_percentage = json.get_int("ReturnPointsWonPercentage")
         self.total_points_won_percentage = json.get_int("TotalPointsWonPercentage")
 
 

@@ -8,6 +8,7 @@ from write_2_gsm_game_count import write_game_set_match_game_count
 from write_2_gsm_highest_defeated import write_game_set_match_highest_defeated
 from write_3_map import write_map
 from write_4_body import write_body_stats
+from write_5_income import write_income
 
 _PLAYER_COUNT = 50
 # Day has to be one of the days the ranking is published.
@@ -23,13 +24,25 @@ def main():
     players = _get_ranking(_RANKING_NOW_DAY)
     players_past = _get_ranking(_RANKING_PAST_DAY)
 
-    output_dir_path = "output"
-    os.makedirs(output_dir_path, exist_ok=True)
-
-    # MARK: 1. Ranking
-
     print("Writing: Ranking")
+    _write_ranking(players, players_past, "1_ranking.md")
 
+    print("Writing: Game, set, match")
+    _write_game_set_match(players, "2_game_set_match.md")
+
+    print("Writing: Map")
+    _write_map(players, "3_map.md")
+
+    print("Writing: Body")
+    _write_body_stats(players, "4_body.md")
+
+    print("Writing: Income")
+    _write_income(players, "5_income.md")
+
+    print("Before publishing please DELETE CACHE and generate again.")
+
+
+def _write_ranking(players: list[Player], players_past: list[Player], file_name: str):
     page = Page()
     page.add(Title("Ranking"))
 
@@ -39,8 +52,7 @@ def main():
         past_ranking=players_past,
         now_date=_RANKING_NOW_DATE,
         now_ranking=players,
-        award_count_raise=5,
-        award_count_drop=5,
+        award_count=5,
     )
 
     write_ranking_volatility(
@@ -51,11 +63,10 @@ def main():
         award_count_max_spread=5,
     )
 
-    _write(page, "1_ranking.md")
+    _write(page, file_name)
 
-    # MARK: Game, set, match
 
-    print("Writing: Game, set, match")
+def _write_game_set_match(players: list[Player], file_name: str):
 
     page = Page()
     page.add(Title("Game, set, match"))
@@ -82,14 +93,12 @@ def main():
         award_count=6,
     )
 
-    _write(page, "2_game_set_match.md")
+    _write(page, file_name)
 
-    # MARK: Map
 
-    print("Writing: Geography")
-
+def _write_map(players: list[Player], file_name: str):
     page = Page()
-    page.add(Title("Geography"))
+    page.add(Title("Map"))
 
     write_map(
         page,
@@ -98,6 +107,10 @@ def main():
         award_count_best_player_per_continent=5,
     )
 
+    _write(page, file_name)
+
+
+def _write_body_stats(players: list[Player], file_name: str):
     page = Page()
     page.add(Title("Body"))
 
@@ -109,6 +122,13 @@ def main():
         award_count_weight=3,
     )
 
+    _write(page, file_name)
+
+
+def _write_income(players: list[Player], file_name: str):
+    page = Page()
+    page.add(Title("Income"))
+    write_income(page, players)
     _write(page, file_name)
 
 
