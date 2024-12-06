@@ -119,7 +119,7 @@ def _read_alpha2_to_emoji_flag() -> dict[str, str]:
 def _read_alpha2_to_ioc_code():
     "https://www.worlddata.info/countrycodes.php"
     result = dict[str, str]()
-    path = _get_file_path("ioc.csv")
+    path = _get_file_path("countries_ioc.csv")
 
     with open(path, "r", encoding="utf-8") as f:
         reader = csv.reader(f, delimiter="\t")
@@ -173,4 +173,4 @@ def _read_json(name: str) -> Any:
 
 def _get_file_path(name: str) -> str:
     dir_path = os.path.dirname(__file__)
-    return os.path.join(dir_path, name)
+    return os.path.join("assets", name)
