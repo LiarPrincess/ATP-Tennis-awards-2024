@@ -1,7 +1,7 @@
 from typing import Iterable
 from dataclasses import dataclass
 from page import Page, Subtitle, Award, Table, Map, MapData
-from atp_api import (
+from atp import (
     Country,
     Continent,
     Player,

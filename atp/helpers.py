@@ -2,7 +2,7 @@ import json
 from typing import Iterable
 from dataclasses import dataclass
 from browser import get_htmls_browser
-from atp_api.json_dict import JSONDict
+from atp.json_dict import JSONDict
 
 REQUEST_INTERVAL_SECONDS = 5
 

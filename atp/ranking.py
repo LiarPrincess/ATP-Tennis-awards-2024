@@ -1,7 +1,7 @@
 from bs4 import BeautifulSoup, Tag
 from dataclasses import dataclass
 from browser import get_html_browser
-from atp_api.helpers import REQUEST_INTERVAL_SECONDS
+from atp.helpers import REQUEST_INTERVAL_SECONDS
 
 CACHE_PATH = "cache/atp_ranking"
 

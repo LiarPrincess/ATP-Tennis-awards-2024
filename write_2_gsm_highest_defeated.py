@@ -1,7 +1,7 @@
 from typing import assert_never
 from dataclasses import dataclass
 from page import Page, Subtitle, Award, Table, Chart, Paragraph
-from atp_api import (
+from atp import (
     Player,
     PlayerTournament,
     PlayerMatch_Played,

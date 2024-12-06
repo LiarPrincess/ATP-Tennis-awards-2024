@@ -1,6 +1,6 @@
 import os
 from page import Page, Title
-from atp_api import Player, get_ranking_top_100_for_date, get_players
+from atp import Player, get_ranking_top_100_for_date, get_players
 from write_1_ranking_change import write_ranking_change
 from write_1_ranking_volatility import write_ranking_volatility
 from write_2_gsm_versus import write_game_set_match_versus

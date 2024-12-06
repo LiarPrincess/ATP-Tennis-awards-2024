@@ -1,7 +1,7 @@
 from typing import Literal
 from dataclasses import dataclass
 from page import Page, Subtitle, Award, Table, Chart, Paragraph
-from atp_api import Player
+from atp import Player
 from helpers import *
 
 _YEAR_DAY_COUNT = 365

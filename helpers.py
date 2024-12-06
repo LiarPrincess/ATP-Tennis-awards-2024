@@ -9,7 +9,7 @@ from typing import (
     assert_never,
 )
 
-from atp_api import (
+from atp import (
     Player,
     PlayerMatch,
     PlayerMatch_Played,

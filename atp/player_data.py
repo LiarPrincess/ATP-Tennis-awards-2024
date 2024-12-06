@@ -1,7 +1,7 @@
 from typing import Literal
-from atp_api.json_dict import JSONDict
-from atp_api.helpers import create_urls, get_json
-from atp_api.countries import get_country_by_ioc_code
+from atp.json_dict import JSONDict
+from atp.helpers import create_urls, get_json
+from atp.countries import get_country_by_ioc_code
 
 CACHE_PATH = "cache/atp_player_data"
 

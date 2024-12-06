@@ -2,7 +2,7 @@ import numpy as np
 import datetime
 from dataclasses import dataclass
 from page import Page, Subtitle, Award, Chart, Paragraph
-from atp_api import Player
+from atp import Player
 from helpers import *
 
 _THOUSAND = 1000

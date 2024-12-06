@@ -20,7 +20,7 @@ from typing import (
     assert_never,
 )
 from dataclasses import dataclass
-from atp_api import Player
+from atp import Player
 
 
 

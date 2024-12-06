@@ -1,8 +1,8 @@
-from atp_api.ranking import get_ranking_top_100, get_ranking_top_100_for_date
-from atp_api.player_stats import PlayerStats_Service, PlayerStats_Return
-from atp_api.player_activity import PlayerTournament
-from atp_api.player_rank_history import PlayerRank
-from atp_api.player_activity import (
+from atp.ranking import get_ranking_top_100, get_ranking_top_100_for_date
+from atp.player_stats import PlayerStats_Service, PlayerStats_Return
+from atp.player_activity import PlayerTournament
+from atp.player_rank_history import PlayerRank
+from atp.player_activity import (
     PlayerTournament,
     PlayerMatch_Round,
     PlayerMatch_Opponent,
@@ -15,11 +15,11 @@ from atp_api.player_activity import (
     PlayerMatch_Retire,
     PlayerMatch_Default,
 )
-from atp_api.countries import Country, Continent, get_all_countries, get_all_continents
+from atp.countries import Country, Continent, get_all_countries, get_all_continents
 
 from typing import Literal as _Literal, assert_never as _assert_never
-from atp_api.player_data import PlayerData as _PlayerData
-from atp_api.json_dict import JSONDict as _JSONDict
+from atp.player_data import PlayerData as _PlayerData
+from atp.json_dict import JSONDict as _JSONDict
 
 
 class Player(_PlayerData):
@@ -72,10 +72,10 @@ class Player(_PlayerData):
 
 
 def get_players(player_ids: list[str]) -> list[Player]:
-    from atp_api.player_data import get_players_data_json
-    from atp_api.player_stats import get_players_stats
-    from atp_api.player_activity import get_players_tournaments
-    from atp_api.player_rank_history import get_players_rank_history
+    from atp.player_data import get_players_data_json
+    from atp.player_stats import get_players_stats
+    from atp.player_activity import get_players_tournaments
+    from atp.player_rank_history import get_players_rank_history
 
     id_to_data = get_players_data_json(player_ids)
     id_to_stats = get_players_stats(player_ids)

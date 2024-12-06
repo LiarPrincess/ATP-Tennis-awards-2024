@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 from page import Page, Subtitle, Award, Table, Chart
-from atp_api import Player
+from atp import Player
 from helpers import *
 
 
