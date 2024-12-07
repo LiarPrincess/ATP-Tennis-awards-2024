@@ -1,0 +1,96 @@
+@font-face {
+  font-family: "Inconsolata";
+  font-style: normal;
+  font-weight: 200 900;
+  font-stretch: 100%;
+  font-display: swap;
+  src: url(Inconsolata-VariableFont_wdth,wght.ttf) format('truetype');
+}
+
+/*
+https://github.com/dracula/dracula-theme?tab=readme-ov-file#color-palette
+background: #282a36
+selection: #44475a
+foreground: #f8f8f2
+comment: #6272a4
+cyan: #8be9fd
+green: #50fa7b
+orange: #ffb86c
+pink: #ff79c6
+purple: #bd93f9
+red: #ff5555
+yellow: #f1fa8c
+*/
+
+body {
+  color: #f8f8f2;
+  background-color: #282a36;
+  font-family: "Inconsolata";
+  -webkit-font-smoothing: auto;
+  -moz-osx-font-smoothing: auto;
+}
+
+h1 {
+  margin: 40px 0;
+  text-align: center;
+  font-size: 96px;
+  font-weight: 800;
+  line-height: 1;
+}
+
+h2 {
+  margin: 40px 0;
+  text-align: center;
+  font-size: 60px;
+  font-weight: 500;
+  line-height: 1;
+}
+
+img {
+  margin: 40px 0;
+  display: block;
+}
+
+.award_group {
+  margin: 80px 0;
+}
+
+.award_emoji {
+  margin: 40px 0;
+  text-align: center;
+  font-size: 128px;
+  line-height: 1;
+}
+
+.award_p {
+  margin: 16px 0;
+  text-align: center;
+  font-size: 36px;
+  line-height: 40px;
+}
+
+.award_table {
+  margin: 32px auto;
+  border-collapse: collapse;
+  font-size: 30px;
+  line-height: 36px;
+}
+
+.award_table td,
+.award_table th {
+  padding: 4px 8px;
+  border-right: 2px solid #44475a;
+}
+
+.award_table td:last-child,
+.award_table th:last-child {
+  border-right: none;
+}
+
+.award_table .text-left {
+  text-align: left;
+}
+
+.award_table .text-right {
+  text-align: right;
+}

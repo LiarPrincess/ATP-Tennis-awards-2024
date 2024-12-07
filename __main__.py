@@ -38,15 +38,17 @@ def render_template(template_name: str, context: Any, image_name: str):
     os.makedirs(tmp_dir_path, exist_ok=True)
 
     # Change chart to its path
-    context_dict: dict[str, Any] = {"width": _IMAGE_WIDTH}
+    padding_x = 10
+    context_dict: dict[str, Any] = {"width": _IMAGE_WIDTH, "padding_x": padding_x}
     image_name_without_extension, _ = os.path.splitext(image_name)
     chart_index = 1
+    chart_width = _IMAGE_WIDTH - 2 * padding_x
 
     for name, o in vars(context).items():
         if isinstance(o, Chart):
             chart_img_name = f"{image_name_without_extension}_chart_{chart_index}.png"
             chart_img_path = os.path.join(tmp_dir_path, chart_img_name)
-            o.write_img(chart_img_path, width=_IMAGE_WIDTH)
+            o.write_img(chart_img_path, width=chart_width)
 
             o = os.path.realpath(chart_img_path)
             chart_index += 1
