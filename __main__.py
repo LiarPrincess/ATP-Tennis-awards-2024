@@ -20,6 +20,7 @@ def main():
     players = _get_ranking(_RANKING_NOW_DAY)
     players_past = _get_ranking(_RANKING_PAST_DAY)
 
+    print("1_ranking")
     data = page1_ranking(
         date_past=_RANKING_PAST_DATE,
         ranking_past=players_past,

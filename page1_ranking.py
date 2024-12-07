@@ -5,6 +5,9 @@ from chart import Chart
 from helpers import *
 
 
+_CHART_ASPECT_RATIO = {"width": 100, "height": 50}
+
+
 @dataclass
 class Page1Data:
 
@@ -122,12 +125,21 @@ def page1_ranking(
 def _create_rank_change_chart(rows: list[Page1Data.Row]) -> Chart:
     chart = Chart()
     chart.set_show_grid(True)
+    chart.set_aspect_rato(**_CHART_ASPECT_RATIO)
 
     # Bars
     rank = [r.rank_now for r in rows]
     rank_change = [r.rank_change for r in rows]
-    color_map = chart.create_color_map(rank_change)
-    color = [color_map[c] for c in rank_change]
+
+    # Separate color map for gain and loss
+    color_map_gain = chart.create_color_map(
+        (r for r in rank_change if r >= 0), "purple_cyan"
+    )
+    color_map_loss = chart.create_color_map(
+        (r for r in rank_change if r <= 0), "red_pink"
+    )
+
+    color = [color_map_gain[c] if c >= 0 else color_map_loss[c] for c in rank_change]
     chart.add_bar(rank, rank_change, color=color)
 
     # X axis
@@ -145,18 +157,24 @@ def _create_rank_change_chart(rows: list[Page1Data.Row]) -> Chart:
 def _create_rank_spread_chart(rows: list[Page1Data.Row]) -> Chart:
     chart = Chart()
     chart.set_show_grid(True)
+    chart.set_aspect_rato(**_CHART_ASPECT_RATIO)
 
     # Bars
     rank = [r.rank_now for r in rows]
     spread = [r.rank_spread for r in rows]
     highest = [r.rank_highest for r in rows]
-    color_map = chart.create_color_map(spread)
+
+    color_map = chart.create_color_map(
+        spread,
+        ["pink", "purple", "cyan"],
+    )
+
     color = [color_map[c] for c in spread]
     chart.add_bar(rank, spread, bottom=highest, color=color)
 
     # Scatter
     rank_now = [r.rank_now for r in rows]
-    chart.add_scatter(rank, rank_now, marker="D", color="black", size=20)
+    chart.add_scatter(rank, rank_now, marker="D", color="foreground", size=20)
 
     # X axis
     x_axis = chart.x_axis
@@ -164,7 +182,7 @@ def _create_rank_spread_chart(rows: list[Page1Data.Row]) -> Chart:
 
     # Y axis
     y_axis = chart.y_axis
-    y_axis.set_label("Highest/lowest rank (current rank in black)")
+    y_axis.set_label("Highest/lowest rank (◆ = current)")
     lowest = [r.rank_lowest for r in rows]
     y_axis.set_major_tick_count(lowest, 10, multiple_of=10)
 
