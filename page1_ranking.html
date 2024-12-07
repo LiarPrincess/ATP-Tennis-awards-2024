@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Page</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap"
+    rel="stylesheet">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inconsolata:wght@200..900&family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap"
+    rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+
+{% set css_h1 = "my-10 text-8xl text-center font-extrabold" %}
+{% set css_h2 = "my-10 text-6xl text-center font-medium" %}
+{% set css_chart = "my-10" %}
+
+{% set css_award_group = "my-20" %}
+{% set css_emoji = "my-10 text-9xl text-center" %}
+{% set css_p = "my-4 text-4xl text-center" %}
+
+{% set css_table = "mx-auto my-8 border-collapse" %}
+{% set css_td = "px-2 py-1 text-3xl border-r-2 last:border-r-0 border-solid border-selection" %}
+
+<!-- Prettier complains if we use '<', so we to find another way to pad. -->
+{% macro render_player(p) -%}
+{{"&nbsp;"|safe if p.rank//10 == 0 else ""}}{{p.rank}} {{p.nationality.flag_emoji}} {{p.name_first}} {{p.name_last}}
+{%- endmacro %}
+
+{% macro render_rank_change_award_table(rows) -%} <table class="{{ css_table }}">
+  <thead>
+    <tr>
+      <th class="{{ css_td }} text-center">Player</th>
+      <th class="{{ css_td }} text-right">Age</th>
+      <th class="{{ css_td }} text-right">{{ date_past }}</th>
+      <th class="{{ css_td }} text-right">{{ date_now }}</th>
+      <th class="{{ css_td }} text-right">Difference</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for row in rows %}
+    <tr>
+      <td class="{{ css_td }} text-left">{{ render_player(row.player) }}</td>
+      <td class="{{ css_td }} text-right">{{ row.player.age }}</td>
+      <td class="{{ css_td }} text-right">{{ row.rank_past }}</td>
+      <td class="{{ css_td }} text-right">{{ row.rank_now }}</td>
+      <td class="{{ css_td }} text-right">{{ row.rank_change }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{%- endmacro %}
+
+{% macro render_rank_spread_table(rows) -%}
+<table class="{{ css_table }}">
+  <thead>
+    <tr>
+      <th class="{{ css_td }} text-center">Player</th>
+      <th class="{{ css_td }} text-right">Age</th>
+      <th class="{{ css_td }} text-right">Highest rank</th>
+      <th class="{{ css_td }} text-right">Lowest rank</th>
+      <th class="{{ css_td }} text-right">Spread</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for row in rows %}
+    <tr>
+      <td class="{{ css_td }} text-left">{{ render_player(row.player) }}</td>
+      <td class="{{ css_td }} text-right">{{ row.player.age }}</td>
+      <td class="{{ css_td }} text-right">{{ row.rank_highest }}</td>
+      <td class="{{ css_td }} text-right">{{ row.rank_lowest }}</td>
+      <td class="{{ css_td }} text-right">{{ row.rank_spread }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{%- endmacro %}
+
+
+<body class="bg-background text-foreground font-mono subpixel-antialiased">
+  <div class="w-[{{ width }}px] mx-auto px-2.5">
+    <h1 class="{{ css_h1 }}">RANKING</h1>
+
+    <!-- MARK: Rank change -->
+
+    <h2 class="{{ css_h2 }}">Rank change since {{ date_past }}</h2>
+    <img class="{{ css_chart }}" src="{{ rank_change_chart }}">
+
+    <div class="{{ css_award_group }}">
+      <p class="{{ css_emoji }}">🦄</p>
+      <p class="{{ css_p }}">Unicorn award for the biggest raise.</p>
+      <p class="{{ css_p }}">
+        {{ player_no_1.name_first }} {{ player_no_1.name_last }} ending the year as No. 1 is impressive,<br />
+        but gaining {{ rank_change_max_gain }} positions in PIF ATP Ranking is also nice.
+      </p>
+      {{ render_rank_change_award_table(rank_change_awards_max_gain) }}
+    </div>
+
+    <div class="{{ css_award_group }}">
+      <p class="{{ css_emoji }}">🦨</p>
+      <p class="{{ css_p }}">Skunk award for the biggest drop.</p>
+      {{ render_rank_change_award_table(rank_change_awards_max_drop) }}
+    </div>
+
+    <div class="{{ css_award_group }}">
+      <p class="{{ css_emoji }}">🦥</p>
+      <p class="{{ css_p }}">Sloth award for… hanging in there.</p>
+      {{ render_rank_change_award_table(rank_change_awards_no_change) }}
+    </div>
+
+    <!-- MARK: Rank spread -->
+
+    <h2 class="{{ css_h2 }}">Rank spread since {{ date_past }}</h2>
+    <img class="{{ css_chart }}" src="{{ rank_spread_chart }}">
+
+    <div class="{{ css_award_group }}">
+      <p class="{{ css_emoji }}">🪺</p>
+      <p class="{{ css_p }}">Nest award for the most consistent players.</p>
+      {{ render_rank_spread_table(rank_spread_awards_min) }}
+    </div>
+
+    <div class="{{ css_award_group }}">
+      <p class="{{ css_emoji }}">🐇</p>
+      <p class="{{ css_p }}">Bunny award for those who like to hop around.</p>
+      {{ render_rank_spread_table(rank_spread_awards_max) }}
+    </div>
+
+  </div>
+</body>
+<script>
+  tailwind.config = {
+    theme: {
+      extend: {
+        colors: {
+          // https://github.com/dracula/dracula-theme?tab=readme-ov-file#color-palette
+          "background": "#282a36",
+          "selection": "#44475a",
+          "foreground": "#f8f8f2",
+          "comment": "#6272a4",
+          "cyan": "#8be9fd",
+          "green": "#50fa7b",
+          "orange": "#ffb86c",
+          "pink": "#ff79c6",
+          "purple": "#bd93f9",
+          "red": "#ff5555",
+          "yellow": "#f1fa8c",
+        },
+        fontFamily: {
+          "sans": ["Inter"],
+          "mono": ["Inconsolata"],
+        },
+      }
+    }
+  }
+</script>
+
+</html>

@@ -1,14 +1,8 @@
 import os
-from page import Page, Title
+from typing import Any
 from atp import Player, get_ranking_top_100_for_date, get_players
-from write_1_ranking_change import write_ranking_change
-from write_1_ranking_volatility import write_ranking_volatility
-from write_2_gsm_versus import write_game_set_match_versus
-from write_2_gsm_game_count import write_game_set_match_game_count
-from write_2_gsm_highest_defeated import write_game_set_match_highest_defeated
-from write_3_map import write_map
-from write_4_body import write_body_stats
-from write_5_income import write_income
+from chart import Chart
+from page1_ranking import page1_ranking
 
 _PLAYER_COUNT = 50
 # Day has to be one of the days the ranking is published.
@@ -17,128 +11,69 @@ _RANKING_NOW_DAY = "2024-11-25"
 _RANKING_PAST_DAY = "2024-01-01"
 _RANKING_NOW_DATE = f"{_RANKING_NOW_DAY}T00:00:00"
 _RANKING_PAST_DATE = f"{_RANKING_PAST_DAY}T00:00:00"
+_IMAGE_WIDTH = 1200
 _OUTPUT_DIR_PATH = "output"
+_ASSETS_DIR_PATH = "assets"
 
 
 def main():
     players = _get_ranking(_RANKING_NOW_DAY)
     players_past = _get_ranking(_RANKING_PAST_DAY)
 
-    print("Writing: Ranking")
-    _write_ranking(players, players_past, "1_ranking.md")
-
-    print("Writing: Game, set, match")
-    _write_game_set_match(players, "2_game_set_match.md")
-
-    print("Writing: Map")
-    _write_map(players, "3_map.md")
-
-    print("Writing: Body")
-    _write_body_stats(players, "4_body.md")
-
-    print("Writing: Income")
-    _write_income(players, "5_income.md")
-
-    print("Before publishing please DELETE CACHE and generate again.")
-
-
-def _write_ranking(players: list[Player], players_past: list[Player], file_name: str):
-    page = Page()
-    page.add(Title("Ranking"))
-
-    write_ranking_change(
-        page,
-        past_date=_RANKING_PAST_DATE,
-        past_ranking=players_past,
-        now_date=_RANKING_NOW_DATE,
-        now_ranking=players,
-        award_count=5,
+    data = page1_ranking(
+        date_past=_RANKING_PAST_DATE,
+        ranking_past=players_past,
+        date_now=_RANKING_NOW_DATE,
+        ranking_now=players,
+        award_count_rank_gain_lose=5,
+        award_count_spread=5,
     )
-
-    write_ranking_volatility(
-        page,
-        players,
-        date_from=_RANKING_PAST_DATE,
-        award_count_min_spread=5,
-        award_count_max_spread=5,
-    )
-
-    _write(page, file_name)
+    render_template("page1_ranking.html", data, "1_ranking.png")
 
 
-def _write_game_set_match(players: list[Player], file_name: str):
-
-    page = Page()
-    page.add(Title("Game, set, match"))
-
-    write_game_set_match_versus(
-        page,
-        players,
-        date_from=_RANKING_PAST_DATE,
-        top_N=10,
-        award_count_unluckiest=5,
-    )
-
-    write_game_set_match_highest_defeated(
-        page,
-        players,
-        date_from=_RANKING_PAST_DATE,
-        award_count_highest_diff=5,
-    )
-
-    write_game_set_match_game_count(
-        page,
-        players,
-        date_from=_RANKING_PAST_DATE,
-        award_count=6,
-    )
-
-    _write(page, file_name)
-
-
-def _write_map(players: list[Player], file_name: str):
-    page = Page()
-    page.add(Title("Map"))
-
-    write_map(
-        page,
-        players,
-        award_count_best_countries=4,
-        award_count_best_player_per_continent=5,
-    )
-
-    _write(page, file_name)
-
-
-def _write_body_stats(players: list[Player], file_name: str):
-    page = Page()
-    page.add(Title("Body"))
-
-    write_body_stats(
-        page,
-        players,
-        award_count_age=5,
-        award_count_height=3,
-        award_count_weight=3,
-    )
-
-    _write(page, file_name)
-
-
-def _write_income(players: list[Player], file_name: str):
-    page = Page()
-    page.add(Title("Income"))
-    write_income(page, players)
-    _write(page, file_name)
-
-
-# MARK: Helpers
-
-
-def _write(page: Page, file_name: str):
+def render_template(template_name: str, context: Any, image_name: str):
+    tmp_dir_path = _ASSETS_DIR_PATH
     os.makedirs(_OUTPUT_DIR_PATH, exist_ok=True)
-    path = os.path.join(_OUTPUT_DIR_PATH, file_name)
-    page.write_html(path, width=1400)
+    os.makedirs(tmp_dir_path, exist_ok=True)
+
+    # Change chart to its path
+    context_dict: dict[str, Any] = {"width": _IMAGE_WIDTH}
+    image_name_without_extension, _ = os.path.splitext(image_name)
+    chart_index = 1
+
+    for name, o in vars(context).items():
+        if isinstance(o, Chart):
+            chart_img_name = f"{image_name_without_extension}_chart_{chart_index}.png"
+            chart_img_path = os.path.join(tmp_dir_path, chart_img_name)
+            o.write_img(chart_img_path, width=_IMAGE_WIDTH)
+
+            o = os.path.realpath(chart_img_path)
+            chart_index += 1
+
+        context_dict[name] = o
+
+    # Write html
+    from jinja2 import Environment, FileSystemLoader, select_autoescape
+
+    env = Environment(
+        loader=FileSystemLoader("."),
+        autoescape=select_autoescape(),
+    )
+    template = env.get_template(template_name)
+    html = template.render(context_dict)
+
+    html_name = image_name_without_extension + ".html"
+    html_path = os.path.join(tmp_dir_path, html_name)
+
+    with open(html_path, "w", encoding="utf-8") as f:
+        f.write(html)
+
+    # Render image
+    from browser import save_png
+
+    html_url = "file:" + os.path.realpath(html_path)
+    image_path = os.path.realpath(os.path.join(_OUTPUT_DIR_PATH, image_name))
+    save_png(html_url, image_path, width=_IMAGE_WIDTH)
 
 
 def _get_ranking(day: str) -> list[Player]:

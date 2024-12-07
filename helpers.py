@@ -8,7 +8,6 @@ from typing import (
     Iterable,
     assert_never,
 )
-
 from atp import (
     Player,
     PlayerMatch,
@@ -20,51 +19,11 @@ from atp import (
     PlayerMatch_NotPlayed,
 )
 
-# MARK: Str
-
-
-def to_str_player(p: Player) -> str:
-    return f"{p.rank} {p.nationality.flag_emoji} {p.name_first} {p.name_last}"
-
-
-def to_str_sets(m: PlayerMatch) -> str:
-    if isinstance(m, PlayerMatch_Bye):
-        return "Bye"
-
-    if isinstance(m, PlayerMatch_NotPlayed):
-        return "Not played"
-
-    if isinstance(m, PlayerMatch_Walkover):
-        return "Walkover"
-
-    if isinstance(m, PlayerMatch_Played | PlayerMatch_Retire | PlayerMatch_Default):
-        result = ""
-
-        for s in m.sets:
-            if s:
-                result += " "
-
-            if m.win_loss == "W":
-                result += str(s.player)
-                result += str(s.opponent)
-            elif m.win_loss == "L":
-                result += str(s.opponent)
-                result += str(s.player)
-            else:
-                assert_never(m.win_loss)
-
-            if s.tie_break:
-                result += f"({s.tie_break})"
-
-        return result
-
-    assert_never(m)
-
-
-# MARK: ABC
-
 T = TypeVar("T")
 U = TypeVar("U")
+
+
+# MARK: Awards
 
 
 class HasPlayer(Protocol):
@@ -72,8 +31,6 @@ class HasPlayer(Protocol):
 
 
 THasPlayer = TypeVar("THasPlayer", bound=HasPlayer)
-
-# MARK: Award
 
 
 def filter_award_equal(
@@ -147,6 +104,17 @@ def _can_receive_award(o: HasPlayer) -> bool:
     return o.player.can_receive_award
 
 
+# MARK: String
+
+
+def substring_until(s: str, until: str) -> str:
+    try:
+        index = s.index(until)
+        return s[:index]
+    except ValueError:
+        return s
+
+
 # MARK: Math
 
 
@@ -188,18 +156,19 @@ def average(xs: Iterable[int | float]) -> float:
     return 1.0 * sum(lst) / len(lst)
 
 
-# MARK String
-
-
-def substring_until(s: str, until: str) -> str:
-    try:
-        index = s.index(until)
-        return s[:index]
-    except ValueError:
-        return s
-
-
 # MARK: Collections
+
+
+def find(os: Iterable[T], predicate: Callable[[T], bool]) -> T:
+    result: T | None = None
+
+    for o in os:
+        if predicate(o):
+            assert result is None, "Multiple matching"
+            result = o
+
+    assert result is not None, "No matching"
+    return result
 
 
 class groupby(Generic[T, U]):

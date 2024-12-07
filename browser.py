@@ -40,7 +40,7 @@ def get_htmls_browser(
         return result
 
     with sync_playwright() as p:
-        browser = p.chromium.launch(headless=False)
+        browser = p.chromium.launch(headless=True)
         page = browser.new_page(viewport=ViewportSize(width=1920, height=1080))
         url_len = len(urls)
 
@@ -59,3 +59,17 @@ def get_htmls_browser(
         browser.close()
 
     return result
+
+
+def save_png(url: str, path: str, /, width: int):
+    with sync_playwright() as p:
+        browser = p.chromium.launch(headless=True)
+        page = browser.new_page(viewport=ViewportSize(width=width, height=720))
+
+        page.goto(url)
+        page.screenshot(
+            path=path,
+            full_page=True,
+            animations="disabled",
+        )
+        browser.close()
