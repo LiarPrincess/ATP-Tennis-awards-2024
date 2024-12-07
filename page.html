@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Page</title>
+  <link rel="stylesheet" href="modern-normalize.css">
+  <link rel="stylesheet" href="main.css">
+</head>
+
+<!-- Prettier complains if we use '<', so we to find another way to pad. -->
+{% macro render_player(p) -%}
+{{"&nbsp;"|safe if p.rank//10 == 0 else ""}}{{p.rank}} {{p.nationality.flag_emoji}} {{p.name_first}} {{p.name_last}}
+{%- endmacro %}
+
+<body>
+  <div style="width: {{ width }}px; padding: 0 {{ padding_x }}px; margin: 0 auto;">
+    {% block content %}{% endblock %}
+  </div>
+</body>
+
+</html>
