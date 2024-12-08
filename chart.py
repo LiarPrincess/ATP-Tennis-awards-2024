@@ -1,3 +1,5 @@
+import pandas as pd
+import geopandas as gpd
 import matplotlib.pyplot as plt
 import matplotlib.axes as pltAxes
 import matplotlib.axis as pltAxis
@@ -12,6 +14,7 @@ from typing import (
     Literal,
     Iterable,
     Sequence,
+    Hashable,
     Callable,
 )
 from helpers import *
@@ -37,6 +40,8 @@ _AXIS_LABEL_COLOR = _COLOR_FOREGROUND
 _AXIS_LABEL_FONT_SIZE = 20
 _AXIS_TICK_COLOR = _COLOR_FOREGROUND
 _AXIS_TICK_FONT_SIZE = 16
+_MAP_ANNOTATION_COLOR = _COLOR_FOREGROUND
+_MAP_ANNOTATION_FONT_SIZE = 20
 
 # MARK: Chart
 
@@ -223,14 +228,7 @@ class Chart:
                 values_unique.add(v)
 
         y_ticks = sorted(values_unique)
-
-        # https://matplotlib.org/stable/users/explain/colors/colorbar_only.html#discrete-and-extended-colorbar-with-continuous-colorscale
-        #
-        # https://stackoverflow.com/a/71453476:
-        # The first figure shows 10 colors, so 11 boundaries are needed.
-        values_bounds = list(y_ticks)
-        values_bounds.append(values_bounds[-1] + 1)
-        norm = pltColors.BoundaryNorm(values_bounds, cmap.N)
+        norm = _create_colorbar_norm(cmap, y_ticks)
 
         # 'pcolorfast' gives incorrect XY ticks
         im = self.ax.pcolor(xs, ys, values, cmap=cmap, norm=norm)
@@ -243,7 +241,7 @@ class Chart:
             ticks=heatmap.y_ticks,
         )
 
-        # This will apply color theme
+        # Apply color theme
         y_axis = Chart.YAxis(cb.ax)
 
         if label is not None:
@@ -285,6 +283,130 @@ class Chart:
             value_to_color[value] = cmap(x)
 
         return value_to_color
+
+    def write_img(self, path: str, *, width: int):
+        _write_img(path, self.fig, width, self._aspect_rato)
+
+
+# MARK: Map
+
+# Data
+# https://www.naturalearthdata.com/downloads/110m-cultural-vectors/
+#
+# Tutorials
+# https://python-graph-gallery.com/web-map-europe-with-color-by-country/
+# https://python-graph-gallery.com/web-map-with-custom-legend/
+# https://www.geophysique.be/2011/01/27/matplotlib-basemap-tutorial-07-shapefiles-unleached/
+
+
+class MapData:
+
+    class Row:
+        def __init__(
+            self,
+            data: gpd.GeoDataFrame,
+            index: Hashable,
+            row: pd.Series,
+        ) -> None:
+            self.data = data
+            self.index = index
+            self.row = row
+
+        def __getitem__(self, name: str) -> Any:
+            return self.data.at[self.index, name]
+
+        def __setitem__(self, name: str, value: Any) -> None:
+            self.data.at[self.index, name] = value
+
+    def __init__(self, shp_path: str) -> None:
+        data = gpd.read_file(shp_path)
+        assert isinstance(data, gpd.GeoDataFrame)
+        self.data = data
+
+    def calculate_centroid(self, column_name: str):
+        proj = self.data.to_crs(epsg=3035)
+        assert isinstance(proj, gpd.GeoDataFrame)
+        centroid = proj.geometry.centroid
+        assert isinstance(centroid, gpd.GeoSeries)
+        self.data[column_name] = centroid.to_crs(self.data.crs)
+
+    def iter_rows(self) -> list[Row]:
+        rows = self.data.iterrows()
+        return [MapData.Row(self.data, i, r) for i, r in rows]
+
+
+class Map:
+
+    def __init__(self) -> None:
+        self.fig, self.ax = plt.subplots(layout="constrained")
+        self.ax.axis("off")
+        self.ax.set_xmargin(0)
+        self.ax.set_ymargin(0)
+        self._aspect_rato: tuple[int, int] | None = None
+        self.ax.set_facecolor(_BACKGROUND_COLOR)  # Inner plot background
+        self.fig.set_facecolor(_BACKGROUND_COLOR)  # Outside plot Background
+
+    def set_aspect_rato(self, width: int, height: int):
+        "Aspect_rato 2:1 means 200px:100px."
+        self._aspect_rato = (width, height)
+
+    def set_longitude_range(self, east: float, west: float):
+        self.ax.set_xlim(east, west)
+
+    def set_latitude_range(self, south: float, north: float):
+        self.ax.set_ylim(south, north)
+
+    def annotate(
+        self,
+        x: float,
+        y: float,
+        s: str,
+    ):
+        self.ax.annotate(
+            s,
+            (x, y),
+            ha="center",
+            va="center",
+            fontfamily=_FONT_NAME,
+            fontsize=_MAP_ANNOTATION_FONT_SIZE,
+            color=_MAP_ANNOTATION_COLOR,
+        )
+
+    def add_data(self, data: MapData, column_name: str):
+        cmap = pltColors.LinearSegmentedColormap.from_list(
+            "map",
+            [
+                _COLOR_SELECTION,
+                _COLOR_COMMENT,
+                _COLOR_PURPLE,
+                _COLOR_PINK,
+            ],
+        )
+
+        values_unique = set()
+
+        for row in data.iter_rows():
+            v = row["VALUE"]
+            values_unique.add(v)
+
+        values = sorted(values_unique)
+        norm = _create_colorbar_norm(cmap, values)
+
+        data.data.plot(
+            ax=self.ax,
+            column=column_name,
+            cmap=cmap,
+            norm=norm,
+            facecolor=_COLOR_FOREGROUND,
+            edgecolor=_COLOR_FOREGROUND,
+            linewidth=0.2,
+            legend=True,
+            legend_kwds={"ticks": values},
+        )
+
+        # Apply color theme
+        colorbar = self.fig.axes[1]
+        Chart.YAxis(colorbar)
 
     def write_img(self, path: str, *, width: int):
         _write_img(path, self.fig, width, self._aspect_rato)
@@ -365,3 +487,13 @@ def _write_img(
         edgecolor=fig.get_edgecolor(),
     )
     plt.close(fig)
+
+
+def _create_colorbar_norm(cmap: pltColors.LinearSegmentedColormap, values: list):
+    # https://matplotlib.org/stable/users/explain/colors/colorbar_only.html#discrete-and-extended-colorbar-with-continuous-colorscale
+    #
+    # https://stackoverflow.com/a/71453476:
+    # The first figure shows 10 colors, so 11 boundaries are needed.
+    copy = sorted(values)
+    copy.append(copy[-1] + 1)
+    return pltColors.BoundaryNorm(copy, cmap.N)

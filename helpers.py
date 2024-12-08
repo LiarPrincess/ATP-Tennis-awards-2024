@@ -171,21 +171,19 @@ def find(os: Iterable[T], predicate: Callable[[T], bool]) -> T:
     return result
 
 
-class groupby(Generic[T, U]):
-    "'itertools.groupby' requires sorted data"
+def group_by_key_id(os: list[T], key: Callable[[T], U]) -> list[tuple[U, list[T]]]:
+    "Group objects based on id of the key object."
+    id_u_to_pair = dict[int, tuple[U, list[T]]]()
 
-    def __init__(self, iterable: list[T], key: Callable[[T], U]):
-        self._data = dict[U, list[T]]()
+    for o in os:
+        u = key(o)
+        id_u = id(u)
+        pair = id_u_to_pair.get(id_u)
 
-        for o in iterable:
-            k = key(o)
-            group = self._data.get(k)
+        if pair is None:
+            pair = (u, list[T]())
+            id_u_to_pair[id_u] = pair
 
-            if group is None:
-                self._data[k] = [o]
-            else:
-                group.append(o)
+        pair[1].append(o)
 
-    def __iter__(self) -> Iterator[tuple[U, list[T]]]:
-        c = self._data.items()
-        return iter(c)
+    return list(id_u_to_pair.values())

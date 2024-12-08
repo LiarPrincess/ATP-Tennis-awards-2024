@@ -54,7 +54,8 @@ h3 {
   line-height: 1;
 }
 
-p {
+p,
+code {
   margin: 16px 0;
   text-align: center;
   font-size: 36px;
@@ -106,8 +107,14 @@ tbody tr:last-child {
 
 table td,
 table th {
-  padding: 1px 2px;
+  padding: 1px 6px;
   border-right: 2px solid #44475a;
+}
+
+table.tight td,
+table.tight th {
+  padding-left: 2px;
+  padding-right: 2px;
 }
 
 table td:last-child,
@@ -115,14 +122,44 @@ table th:last-child {
   border-right: none;
 }
 
-table .text-center {
+/* MARK: Mixins */
+
+.text-cyan {
+  color: #8be9fd !important;
+}
+
+.text-green {
+  color: #50fa7b !important;
+}
+
+.text-orange {
+  color: #ffb86c !important;
+}
+
+.text-pink {
+  color: #ff79c6 !important;
+}
+
+.text-purple {
+  color: #bd93f9 !important;
+}
+
+.text-red {
+  color: #ff5555 !important;
+}
+
+.text-yellow {
+  color: #f1fa8c !important;
+}
+
+.text-center {
   text-align: center !important;
 }
 
-table .text-left {
+.text-left {
   text-align: left !important;
 }
 
-table .text-right {
+.text-right {
   text-align: right !important;
 }
