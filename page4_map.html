@@ -1,0 +1,120 @@
+{% extends "page.html" %}
+{% block content %}
+
+<h1>Map</h1>
+
+<!-- MARK: Country -->
+
+<h2>Countries</h2>
+<img src="{{ map_chart }}">
+
+<div class="award_group">
+  <p class="award_emoji">🇮🇹</p>
+  <p>
+    Italy award for the best tally.
+  </p>
+  <table>
+    <thead>
+      <tr>
+        <th>Country</th>
+        <th>Count</th>
+        <th>Players</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for r in country_awards_rows %}
+      {% for p in r.players %}
+      <tr>
+        {% if loop.first %}
+        <td class="text-left" rowspan="{{ r.players_len }}">{{ r.country.flag_emoji }} {{r.country.name}}</td>
+        <td class="text-center" rowspan="{{ r.players_len }}">{{ r.players_len }}</td>
+        <td class="text-left">{{ render_player(p) }}</td>
+        {% else %}
+        <td class="text-left">{{ render_player(p) }}</td>
+        {% endif %}
+      </tr>
+      {% endfor %}
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+<!-- MARK: Continent -->
+
+<h2>Continents</h2>
+
+<table>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Count</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for row in continent_count_rows %}
+    <tr>
+      <td class="text-left">{{ row.continent.name }}</td>
+      <td class="text-right">{{ row.players_len }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+{{ render_continent_award(
+"🐦",
+"Unladen swallow award for the best players from Europe.",
+continent_awards_europe
+) }}
+
+
+{{ render_continent_award(
+"🦅",
+"Eagle award for the best players from North America.",
+continent_awards_north_america
+) }}
+
+{{ render_continent_award(
+"🐲",
+'Dragon award for the best players from Asia.<br>(<span class="text-cyan">github.com/annexare/Countries</span> puts
+Russia in Asia.)',
+continent_awards_asia
+) }}
+
+{{ render_continent_award(
+"🦤",
+"Dodo award for the best players not from the above.",
+continent_awards_other
+) }}
+
+{% endblock %}
+
+<!-- MARK: Macros -->
+
+{% macro render_continent_award(emoji, text, players) -%}
+<div class="award_group">
+  <p class="award_emoji">{{ emoji }}</p>
+  <p>{{ text|safe }}</p>
+  <table>
+    <thead>
+      <tr>
+        <th>Player</th>
+        <th>Age</th>
+        <th>Country</th>
+        <th>Birthplace</th>
+        <th>Residence</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for p in players %}
+      <tr>
+        <td class="text-left">{{ render_player(p) }}</td>
+        <td class="text-right">{{ p.age }}</td>
+        <td class="text-left">{{ p.nationality.name }}</td>
+        <td class="text-left">{{ p.nationality_birth_city }}</td>
+        <td class="text-left">{{ p.nationality_residence if p.nationality_residence else "" }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{%- endmacro %}

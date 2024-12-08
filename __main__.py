@@ -1,9 +1,11 @@
 import os
 from typing import Any
 from atp import Player, get_ranking_top_100_for_date, get_players
-from chart import Chart
+from chart import Chart, Map
 from page1_ranking import page1_ranking
 from page2_game_set_match import page2_game_set_match
+from page3_game_set_match_2 import page3_game_set_match_2
+from page4_map import page4_map
 
 _PLAYER_COUNT = 50
 # Day has to be one of the days the ranking is published.
@@ -21,8 +23,18 @@ def main():
     players = _get_ranking(_RANKING_NOW_DAY)
     players_past = _get_ranking(_RANKING_PAST_DAY)
 
+    print("1 Ranking")
+    data = page1_ranking(
+        date_past=_RANKING_PAST_DATE,
+        ranking_past=players_past,
+        date_now=_RANKING_NOW_DATE,
+        ranking_now=players,
+        award_count_rank_gain_lose=5,
+        award_count_spread=5,
+    )
+    render_template("page1_ranking.html", data, "1_ranking.png")
 
-    print("2_gsm")
+    print("2 Game, set, match")
     data = page2_game_set_match(
         players,
         date_from=_RANKING_PAST_DATE,
@@ -30,6 +42,23 @@ def main():
         award_count_unlucky=5,
     )
     render_template("page2_game_set_match.html", data, "2_game_set_match.png")
+
+    print("3 Game, set, match 2")
+    data = page3_game_set_match_2(
+        players,
+        date_from=_RANKING_PAST_DATE,
+        award_count_highest_defeated=5,
+        award_count_game_count=6,
+    )
+    render_template("page3_game_set_match_2.html", data, "3_game_set_match_2.png")
+
+    print("4 Map")
+    data = page4_map(
+        players,
+        award_count_best_countries=3,
+        award_count_best_player_per_continent=5,
+    )
+    render_template("page4_map.html", data, "4_map.png")
 
 
 def render_template(template_name: str, context: Any, image_name: str):
@@ -45,7 +74,7 @@ def render_template(template_name: str, context: Any, image_name: str):
     chart_width = _IMAGE_WIDTH - 2 * padding_x
 
     for name, o in vars(context).items():
-        if isinstance(o, Chart):
+        if isinstance(o, Chart | Map):
             chart_img_name = f"{image_name_without_extension}_chart_{chart_index}.png"
             chart_img_path = os.path.join(tmp_dir_path, chart_img_name)
             o.write_img(chart_img_path, width=chart_width)
