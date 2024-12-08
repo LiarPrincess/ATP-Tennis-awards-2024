@@ -1,7 +1,7 @@
 {% extends "page.html" %}
 
 {% block content %}
-<h1>RANKING</h1>
+<h1>Ranking</h1>
 
 <!-- MARK: Rank change -->
 
@@ -10,9 +10,9 @@
 
 <div class="award_group">
   <p class="award_emoji">🦄</p>
-  <p class="award_p">Unicorn award for the biggest raise.</p>
-  <p class="award_p">
-    {{ player_no_1.name_first }} {{ player_no_1.name_last }} ending the year as No. 1 is impressive,<br />
+  <p>Unicorn award for the biggest raise.</p>
+  <p>
+    {{ player_no_1.name_first }} {{ player_no_1.name_last }} ending the year as No. 1 is impressive,<br>
     but gaining {{ rank_change_max_gain }} positions in PIF ATP Ranking is also nice.
   </p>
   {{ render_rank_change_award_table(rank_change_awards_max_gain) }}
@@ -20,13 +20,13 @@
 
 <div class="award_group">
   <p class="award_emoji">🦨</p>
-  <p class="award_p">Skunk award for the biggest drop.</p>
+  <p>Skunk award for the biggest drop.</p>
   {{ render_rank_change_award_table(rank_change_awards_max_drop) }}
 </div>
 
 <div class="award_group">
   <p class="award_emoji">🦥</p>
-  <p class="award_p">Sloth award for… hanging in there.</p>
+  <p>Sloth award for… hanging in there.</p>
   {{ render_rank_change_award_table(rank_change_awards_no_change) }}
 </div>
 
@@ -37,13 +37,13 @@
 
 <div class="award_group">
   <p class="award_emoji">🪺</p>
-  <p class="award_p">Nest award for the most consistent players.</p>
+  <p>Nest award for the most consistent players.</p>
   {{ render_rank_spread_table(rank_spread_awards_min) }}
 </div>
 
 <div class="award_group">
   <p class="award_emoji">🐇</p>
-  <p class="award_p">Bunny award for those who like to hop around.</p>
+  <p>Bunny award for those who like to hop around.</p>
   {{ render_rank_spread_table(rank_spread_awards_max) }}
 </div>
 {% endblock %}
@@ -51,14 +51,14 @@
 <!-- MARK: Macros -->
 
 {% macro render_rank_change_award_table(rows) -%}
-<table class="award_table">
+<table>
   <thead>
     <tr>
-      <th class="text-center">Player</th>
-      <th class="text-right">Age</th>
-      <th class="text-right">{{ date_past }}</th>
-      <th class="text-right">{{ date_now }}</th>
-      <th class="text-right">Difference</th>
+      <th>Player</th>
+      <th>Age</th>
+      <th>{{ date_past }}</th>
+      <th>{{ date_now }}</th>
+      <th>Difference</th>
     </tr>
   </thead>
   <tbody>
@@ -76,14 +76,14 @@
 {%- endmacro %}
 
 {% macro render_rank_spread_table(rows) -%}
-<table class="award_table">
+<table>
   <thead>
     <tr>
-      <th class="text-center">Player</th>
-      <th class="text-right">Age</th>
-      <th class="text-right">Highest rank</th>
-      <th class="text-right">Lowest rank</th>
-      <th class="text-right">Spread</th>
+      <th>Player</th>
+      <th>Age</th>
+      <th>Highest rank</th>
+      <th>Lowest rank</th>
+      <th>Spread</th>
     </tr>
   </thead>
   <tbody>

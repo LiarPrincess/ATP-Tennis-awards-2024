@@ -1,0 +1,160 @@
+{% extends "page.html" %}
+{% block content %}
+
+<h1>Game, set, match</h1>
+
+<h2>Match count since {{ date_from }}</h2>
+
+<p>
+  All games, including Olympics etc. <br> Only singles (as in 1 on 1 matches, not their marriage status).
+</p>
+
+<img src="{{ versus_chart }}">
+
+<p>
+  Tip: for this type of charts you should stand further away, <br>
+  this way your eye will &ldquo;blend&rdquo; the colors, <br>
+  and it will be easier to see concentrations.
+</p>
+
+<div class="award_group">
+  <p class="award_emoji">🐈</p>
+  <p>
+    Cat award for the luckiest player - top {{ top_N }} player with the least matches against the top {{ top_N }}.
+  </p>
+  <table>
+    <thead>
+      <tr>
+        <th>Player</th>
+        <th>Win</th>
+        <th>Loss</th>
+        <th>Win%</th>
+        <th>Total</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for row in versus_awards_lucky %}
+      <tr>
+        {% set win_pct = 100.0*row.top_N_win_count/row.top_N_count %}
+        <td class="text-left">{{ render_player(row.player) }}</td>
+        <td class="text-right">{{ row.top_N_win_count }}</td>
+        <td class="text-right">{{ row.top_N_loss_count }}</td>
+        <td class="text-right">{{ win_pct|int }}%</td>
+        <td class="text-right">{{ row.top_N_count }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+<div class="award_group">
+  <p class="award_emoji">🐈‍⬛</p>
+  <p>
+    Black cat award for the unluckiest player - player outside of the top {{ top_N }} with the most matches against the
+    top {{ top_N }}.
+  </p>
+
+  {% for row in versus_awards_unlucky_main %}
+  <h3>
+    {{ render_player(row.player) }}:
+
+    {% if row.top_N_win_count == 1 %}
+    1 win
+    {% else %}
+    {{ row.top_N_win_count }} wins
+    {% endif %}
+
+    {% if row.top_N_loss_count == 1 %}
+    1 loss
+    {% else %}
+    {{ row.top_N_loss_count }} losses
+    {% endif %}
+  </h3>
+  <table>
+    <thead>
+      <tr>
+        <th>Opponent</th>
+        <th>Win?</th>
+        <th>Result</th>
+        <th>Tournament</th>
+        <th>Round</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for m in row.top_N_matches %}
+      <tr>
+        <td class="text-left">{{ render_player(m.opponent) }}</td>
+        <td class="text-center">
+          {% if m.match.win_loss == "W" %}🏆{% else %}{% endif %}
+        </td>
+        <td class="text-left">{{ m.result }}</td>
+        <td class="text-left">{{ m.tournament.name }}</td>
+        <td class="text-left">{{ m.match.round.id }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% endfor %}
+
+  <h3>Honorable mentions</h3>
+  <table>
+    <thead>
+      <tr>
+        <th>Player</th>
+        <th>Win</th>
+        <th>Loss</th>
+        <th>Win%</th>
+        <th>Total</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for row in versus_awards_unlucky_honorable %}
+      <tr>
+        {% set win_pct = 100.0*row.top_N_win_count/row.top_N_count %}
+        <td class="text-left">{{ render_player(row.player) }}</td>
+        <td class="text-right">{{ row.top_N_win_count }}</td>
+        <td class="text-right">{{ row.top_N_loss_count }}</td>
+        <td class="text-right">{{ win_pct|int }}%</td>
+        <td class="text-right">{{ row.top_N_count }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+<div class="award_group">
+  <p class="award_emoji">🦢❤️🦢</p>
+  <p>Lovebird award for the most common pair outside of the top 10.</p>
+
+  {% for pair in versus_awards_love %}
+  <h3 style="margin-top: 70px;">{{ render_player(pair.player1) }} 💏 {{ render_player(pair.player2) }}</h3>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Winner</th>
+        <th>Result</th>
+        <th>Tournament</th>
+        <th>Round</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for m in pair.matches %}
+      <tr>
+        <td class="text-left">{{ render_player(m.winner) }}</td>
+        <td class="text-left">{{ m.result }}</td>
+        <td class="text-left">{{ m.tournament.name }}</td>
+        <td class="text-left">{{ m.match.round.id }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  {% if pair.dominant_player %}
+  <p>{{ render_player(pair.dominant_player) }} is truly a "top" in this relationship.</p>
+  {% else %}
+  <p>We hope they created a lot of happy memories together!</p>
+  {% endif %}
+  {% endfor %}
+</div>
+{% endblock %}

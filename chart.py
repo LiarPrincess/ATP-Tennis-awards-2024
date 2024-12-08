@@ -4,7 +4,9 @@ import matplotlib.axis as pltAxis
 import matplotlib.colors as pltColors
 import matplotlib.figure as pltFigure
 import matplotlib.ticker as pltTicker
+import matplotlib.collections as pltCollections
 import matplotlib.font_manager as pltFontManager
+from dataclasses import dataclass
 from typing import (
     Any,
     Literal,
@@ -26,7 +28,15 @@ _COLOR_YELLOW = "#f1fa8c"
 _COLOR_ORANGE = "#ffb86c"
 _COLOR_RED = "#ff5555"
 
+_FONT_NAME = "Inconsolata"
 pltFontManager.fontManager.addfont("assets/Inconsolata-VariableFont_wdth,wght.ttf")
+
+_BACKGROUND_COLOR = _COLOR_BACKGROUND
+_GRID_COLOR = _COLOR_SELECTION
+_AXIS_LABEL_COLOR = _COLOR_FOREGROUND
+_AXIS_LABEL_FONT_SIZE = 20
+_AXIS_TICK_COLOR = _COLOR_FOREGROUND
+_AXIS_TICK_FONT_SIZE = 16
 
 # MARK: Chart
 
@@ -67,25 +77,24 @@ class Chart:
         def __init__(self, ax: pltAxes.Axes, axis: pltAxis.Axis) -> None:
             self.ax = ax
             self.axis = axis
-            self.axis.label.set_fontsize(20)
-            self.axis.label.set_fontname("Inconsolata")
-            self.axis.label.set_color(_COLOR_FOREGROUND)
-            self.axis.axes.set_facecolor("#ff0000")
+            self.axis.label.set_fontsize(_AXIS_LABEL_FONT_SIZE)
+            self.axis.label.set_fontname(_FONT_NAME)
+            self.axis.label.set_color(_AXIS_LABEL_COLOR)
 
             # https://matplotlib.org/stable/api/_as_gen/matplotlib.axes.Axes.tick_params.html
             self.axis.set_tick_params(
                 which="both",
-                labelsize=16,
-                labelcolor=_COLOR_FOREGROUND,
-                labelfontfamily="Inconsolata",
-                color=_COLOR_FOREGROUND,
-                grid_color=_COLOR_SELECTION,
+                labelsize=_AXIS_TICK_FONT_SIZE,
+                labelcolor=_AXIS_LABEL_COLOR,
+                labelfontfamily=_FONT_NAME,
+                color=_AXIS_TICK_COLOR,
+                grid_color=_GRID_COLOR,
             )
 
             self.ax.spines["top"].set_visible(False)
             self.ax.spines["right"].set_visible(False)
-            self.ax.spines["bottom"].set_color(_COLOR_FOREGROUND)
-            self.ax.spines["left"].set_color(_COLOR_FOREGROUND)
+            self.ax.spines["bottom"].set_color(_AXIS_TICK_COLOR)
+            self.ax.spines["left"].set_color(_AXIS_TICK_COLOR)
 
         def set_major_tick_interval(self, interval: int):
             loc = pltTicker.MultipleLocator(interval)
@@ -142,8 +151,8 @@ class Chart:
         self.x_axis = Chart.XAxis(self.ax)
         self.y_axis = Chart.YAxis(self.ax)
         self._aspect_rato: tuple[int, int] | None = None
-        self.ax.set_facecolor(_COLOR_BACKGROUND)  # Inner plot background
-        self.fig.set_facecolor(_COLOR_BACKGROUND)  # Outside plot Background
+        self.ax.set_facecolor(_BACKGROUND_COLOR)  # Inner plot background
+        self.fig.set_facecolor(_BACKGROUND_COLOR)  # Outside plot Background
 
     def set_title(self, value: str):
         self.ax.set_title(value)
@@ -181,6 +190,63 @@ class Chart:
     ):
         color_2 = _color_literal_to_hex_or_none(color)
         self.ax.scatter(x, y, s=size, c=color_2, marker=marker)
+
+    @dataclass
+    class Heatmap:
+        im: pltCollections.Collection
+        y_ticks: list["Chart.Value"]
+
+    def add_heatmap(
+        self,
+        xs: Xs,
+        ys: Xs,
+        values: Sequence[Values],
+    ) -> Heatmap:
+        cmap = pltColors.LinearSegmentedColormap.from_list(
+            "heatmap",
+            [
+                _COLOR_BACKGROUND,
+                _COLOR_SELECTION,
+                _COLOR_COMMENT,
+                _COLOR_CYAN,
+                _COLOR_PURPLE,
+                _COLOR_PINK,
+                _COLOR_FOREGROUND,
+            ],
+        )
+
+        values_unique = set[Chart.Value]()
+
+        for vs in values:
+            for v in vs:
+                values_unique.add(v)
+
+        y_ticks = sorted(values_unique)
+
+        # https://matplotlib.org/stable/users/explain/colors/colorbar_only.html#discrete-and-extended-colorbar-with-continuous-colorscale
+        #
+        # https://stackoverflow.com/a/71453476:
+        # The first figure shows 10 colors, so 11 boundaries are needed.
+        values_bounds = list(y_ticks)
+        values_bounds.append(values_bounds[-1] + 1)
+        norm = pltColors.BoundaryNorm(values_bounds, cmap.N)
+
+        # 'pcolorfast' gives incorrect XY ticks
+        im = self.ax.pcolor(xs, ys, values, cmap=cmap, norm=norm)
+        return Chart.Heatmap(im, y_ticks)
+
+    def add_color_bar(self, heatmap: Heatmap, label: str | None = None):
+        cb = self.fig.colorbar(
+            heatmap.im,
+            ax=self.ax,
+            ticks=heatmap.y_ticks,
+        )
+
+        # This will apply color theme
+        y_axis = Chart.YAxis(cb.ax)
+
+        if label is not None:
+            y_axis.set_label(label)
 
     def add_legend(self, entries: list[str] | None = None):
         if entries is None:

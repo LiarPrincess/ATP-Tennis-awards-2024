@@ -3,6 +3,7 @@ from typing import Any
 from atp import Player, get_ranking_top_100_for_date, get_players
 from chart import Chart
 from page1_ranking import page1_ranking
+from page2_game_set_match import page2_game_set_match
 
 _PLAYER_COUNT = 50
 # Day has to be one of the days the ranking is published.
@@ -20,16 +21,15 @@ def main():
     players = _get_ranking(_RANKING_NOW_DAY)
     players_past = _get_ranking(_RANKING_PAST_DAY)
 
-    print("1_ranking")
-    data = page1_ranking(
-        date_past=_RANKING_PAST_DATE,
-        ranking_past=players_past,
-        date_now=_RANKING_NOW_DATE,
-        ranking_now=players,
-        award_count_rank_gain_lose=5,
-        award_count_spread=5,
+
+    print("2_gsm")
+    data = page2_game_set_match(
+        players,
+        date_from=_RANKING_PAST_DATE,
+        top_N=10,
+        award_count_unlucky=5,
     )
-    render_template("page1_ranking.html", data, "1_ranking.png")
+    render_template("page2_game_set_match.html", data, "2_game_set_match.png")
 
 
 def render_template(template_name: str, context: Any, image_name: str):

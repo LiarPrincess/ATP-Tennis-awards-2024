@@ -9,7 +9,7 @@ _CHART_ASPECT_RATIO = {"width": 100, "height": 50}
 
 
 @dataclass
-class Page1Data:
+class Page:
 
     @dataclass
     class Row:
@@ -54,7 +54,7 @@ def page1_ranking(
     ranking_now: list[Player],
     award_count_rank_gain_lose: int,
     award_count_spread: int,
-) -> Page1Data:
+) -> Page:
     rows = _get_rows(
         ranking_now,
         date_past=date_past,
@@ -107,7 +107,7 @@ def page1_ranking(
         key=lambda r: r.rank_spread,
     )
 
-    return Page1Data(
+    return Page(
         date_now=date_now_short,
         date_past=date_past_short,
         player_no_1=player_no_1.player,
@@ -122,7 +122,10 @@ def page1_ranking(
     )
 
 
-def _create_rank_change_chart(rows: list[Page1Data.Row]) -> Chart:
+# MARK: Charts
+
+
+def _create_rank_change_chart(rows: list[Page.Row]) -> Chart:
     chart = Chart()
     chart.set_show_grid(True)
     chart.set_aspect_rato(**_CHART_ASPECT_RATIO)
@@ -154,7 +157,7 @@ def _create_rank_change_chart(rows: list[Page1Data.Row]) -> Chart:
     return chart
 
 
-def _create_rank_spread_chart(rows: list[Page1Data.Row]) -> Chart:
+def _create_rank_spread_chart(rows: list[Page.Row]) -> Chart:
     chart = Chart()
     chart.set_show_grid(True)
     chart.set_aspect_rato(**_CHART_ASPECT_RATIO)
@@ -189,12 +192,15 @@ def _create_rank_spread_chart(rows: list[Page1Data.Row]) -> Chart:
     return chart
 
 
+# MARK: Rows
+
+
 def _get_rows(
     players: list[Player],
     date_past: str,
     on_current_rank_none: Literal["throw", "ignore"],
-) -> list[Page1Data.Row]:
-    result = list[Page1Data.Row]()
+) -> list[Page.Row]:
+    result = list[Page.Row]()
 
     for p in players:
         rank_now = p.rank
@@ -227,7 +233,7 @@ def _get_rows(
         assert rank_lowest is not None
         assert rank_highest is not None
 
-        r = Page1Data.Row(
+        r = Page.Row(
             player=p,
             rank_now=rank_now,
             rank_past=rank_past,

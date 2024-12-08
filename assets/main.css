@@ -36,6 +36,7 @@ h1 {
   font-size: 96px;
   font-weight: 800;
   line-height: 1;
+  text-transform: uppercase;
 }
 
 h2 {
@@ -44,6 +45,20 @@ h2 {
   font-size: 60px;
   font-weight: 500;
   line-height: 1;
+}
+
+h3 {
+  margin: 40px 0;
+  text-align: center;
+  font-size: 40px;
+  line-height: 1;
+}
+
+p {
+  margin: 16px 0;
+  text-align: center;
+  font-size: 36px;
+  line-height: 40px;
 }
 
 img {
@@ -62,35 +77,36 @@ img {
   line-height: 1;
 }
 
-.award_p {
-  margin: 16px 0;
-  text-align: center;
-  font-size: 36px;
-  line-height: 40px;
-}
-
-.award_table {
+table {
   margin: 32px auto;
   border-collapse: collapse;
   font-size: 30px;
   line-height: 36px;
 }
 
-.award_table td,
-.award_table th {
-  padding: 4px 8px;
+table th {
+  text-align: center;
+}
+
+table td,
+table th {
+  padding: 4px 6px;
   border-right: 2px solid #44475a;
 }
 
-.award_table td:last-child,
-.award_table th:last-child {
+table td:last-child,
+table th:last-child {
   border-right: none;
 }
 
-.award_table .text-left {
+table .text-center {
+  text-align: center;
+}
+
+table .text-left {
   text-align: left;
 }
 
-.award_table .text-right {
+table .text-right {
   text-align: right;
 }
