@@ -9,10 +9,41 @@
   <link rel="stylesheet" href="main.css">
 </head>
 
-<!-- Prettier complains if we use '<', so we to find another way to pad. -->
 {% macro render_player(p) -%}
 {{"&nbsp;"|safe if p.rank//10 == 0
 else""}}{{p.rank}}&nbsp;{{p.nationality.flag_emoji}}&nbsp;{{p.name_first}}&nbsp;{{p.name_last}}
+{%- endmacro %}
+
+{% macro _render_set(match, s) -%}
+{%- if match.win_loss == "W" -%}{{- s.player }}{{ s.opponent -}}
+{%- else -%}{{- s.opponent }}{{ s.player -}}
+{%- endif -%}
+{%- if s.tie_break -%}<sup>{{ s.tie_break }}</sup>{%- endif -%}
+{%- endmacro %}
+
+{% macro render_sets(match) -%}
+{% set match_type = match.__class__.__name__ %}
+
+{% if match_type == "PlayerMatch_Bye" %}Bye
+{% elif match_type == "PlayerMatch_NotPlayed" %}Not played
+{% elif match_type == "PlayerMatch_Walkover" %}Walkover
+
+{% elif match_type in ["PlayerMatch_Played", "PlayerMatch_Retire", "PlayerMatch_Default"] %}
+{%- for s in match.sets -%}
+{% if loop.index0 != 0 %}&nbsp;{% endif %}{{ _render_set(match, s) }}
+{%- endfor -%}
+
+{% else %}
+{{ match_type }}
+{% endif %}
+{%- endmacro %}
+
+{% macro render_tournament(t) -%}
+{{ t.name }}
+{%- endmacro %}
+
+{% macro render_round(r) -%}
+{{ r.id }}
 {%- endmacro %}
 
 <body>

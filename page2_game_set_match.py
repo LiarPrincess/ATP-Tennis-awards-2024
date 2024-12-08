@@ -33,7 +33,6 @@ class Page:
             match: "Page.Row.MatchData"
             opponent: Player
             opponent_rank: int
-            result: str
 
         player: Player
         player_rank: int
@@ -54,7 +53,6 @@ class Page:
             tournament: PlayerTournament
             match: "Page.Row.MatchData"
             winner: Player
-            result: str
 
         player1: Player
         player2: Player
@@ -177,8 +175,7 @@ def _get_rows(players: list[Player], date_from: str, top_N: int) -> list[Page.Ro
                         continue
 
                     assert o.rank is not None
-                    m_result = to_str_match_result(m)
-                    match = Page.Row.Match(t, m, o, o.rank, m_result)
+                    match = Page.Row.Match(t, m, o, o.rank)
                     row.matches.append(match)
 
                     if o.rank <= top_N:
@@ -252,8 +249,7 @@ def _get_love_rows(rows: list[Page.Row], top_N: int) -> list[Page.LoveRow]:
 
             winner = r.player
             winner_ids.append(winner.id)
-            match_result = to_str_match_result(m.match)
-            lm = Page.LoveRow.Match(m.tournament, m.match, winner, match_result)
+            lm = Page.LoveRow.Match(m.tournament, m.match, winner)
             love_row.matches.append(lm)
 
         # We have matches for both sides.

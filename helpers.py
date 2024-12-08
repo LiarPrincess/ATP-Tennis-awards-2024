@@ -107,40 +107,6 @@ def _can_receive_award(o: HasPlayer) -> bool:
 # MARK: String
 
 
-def to_str_match_result(m: PlayerMatch) -> str:
-    if isinstance(m, PlayerMatch_Bye):
-        return "Bye"
-
-    if isinstance(m, PlayerMatch_NotPlayed):
-        return "Not played"
-
-    if isinstance(m, PlayerMatch_Walkover):
-        return "Walkover"
-
-    if isinstance(m, PlayerMatch_Played | PlayerMatch_Retire | PlayerMatch_Default):
-        result = ""
-
-        for s in m.sets:
-            if s:
-                result += " "
-
-            if m.win_loss == "W":
-                result += str(s.player)
-                result += str(s.opponent)
-            elif m.win_loss == "L":
-                result += str(s.opponent)
-                result += str(s.player)
-            else:
-                assert_never(m.win_loss)
-
-            if s.tie_break:
-                result += f"({s.tie_break})"
-
-        return result
-
-    assert_never(m)
-
-
 def substring_until(s: str, until: str) -> str:
     try:
         index = s.index(until)

@@ -6,7 +6,7 @@
 <h2>Match count since {{ date_from }}</h2>
 
 <p>
-  All games, including Olympics etc. <br> Only singles (as in 1 on 1 matches, not their marriage status).
+  All games, including the Olympics etc. <br> Only singles (as in 1 on 1 matches, not their marriage status).
 </p>
 
 <img src="{{ versus_chart }}">
@@ -22,29 +22,7 @@
   <p>
     Cat award for the luckiest player - top {{ top_N }} player with the least matches against the top {{ top_N }}.
   </p>
-  <table>
-    <thead>
-      <tr>
-        <th>Player</th>
-        <th>Win</th>
-        <th>Loss</th>
-        <th>Win%</th>
-        <th>Total</th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for row in versus_awards_lucky %}
-      <tr>
-        {% set win_pct = 100.0*row.top_N_win_count/row.top_N_count %}
-        <td class="text-left">{{ render_player(row.player) }}</td>
-        <td class="text-right">{{ row.top_N_win_count }}</td>
-        <td class="text-right">{{ row.top_N_loss_count }}</td>
-        <td class="text-right">{{ win_pct|int }}%</td>
-        <td class="text-right">{{ row.top_N_count }}</td>
-      </tr>
-      {% endfor %}
-    </tbody>
-  </table>
+  {{ render_table_win_loss_winpct_total(versus_awards_lucky) }}
 </div>
 
 <div class="award_group">
@@ -87,9 +65,9 @@
         <td class="text-center">
           {% if m.match.win_loss == "W" %}🏆{% else %}{% endif %}
         </td>
-        <td class="text-left">{{ m.result }}</td>
-        <td class="text-left">{{ m.tournament.name }}</td>
-        <td class="text-left">{{ m.match.round.id }}</td>
+        <td class="text-left">{{ render_sets(m.match) }}</td>
+        <td class="text-left">{{ render_tournament(m.tournament) }}</td>
+        <td class="text-left">{{ render_round(m.match.round) }}</td>
       </tr>
       {% endfor %}
     </tbody>
@@ -97,29 +75,7 @@
   {% endfor %}
 
   <h3>Honorable mentions</h3>
-  <table>
-    <thead>
-      <tr>
-        <th>Player</th>
-        <th>Win</th>
-        <th>Loss</th>
-        <th>Win%</th>
-        <th>Total</th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for row in versus_awards_unlucky_honorable %}
-      <tr>
-        {% set win_pct = 100.0*row.top_N_win_count/row.top_N_count %}
-        <td class="text-left">{{ render_player(row.player) }}</td>
-        <td class="text-right">{{ row.top_N_win_count }}</td>
-        <td class="text-right">{{ row.top_N_loss_count }}</td>
-        <td class="text-right">{{ win_pct|int }}%</td>
-        <td class="text-right">{{ row.top_N_count }}</td>
-      </tr>
-      {% endfor %}
-    </tbody>
-  </table>
+  {{ render_table_win_loss_winpct_total(versus_awards_unlucky_honorable) }}
 </div>
 
 <div class="award_group">
@@ -142,9 +98,9 @@
       {% for m in pair.matches %}
       <tr>
         <td class="text-left">{{ render_player(m.winner) }}</td>
-        <td class="text-left">{{ m.result }}</td>
-        <td class="text-left">{{ m.tournament.name }}</td>
-        <td class="text-left">{{ m.match.round.id }}</td>
+        <td class="text-left">{{ render_sets(m.match) }}</td>
+        <td class="text-left">{{ render_tournament(m.tournament) }}</td>
+        <td class="text-left">{{ render_round(m.match.round) }}</td>
       </tr>
       {% endfor %}
     </tbody>
@@ -158,3 +114,29 @@
   {% endfor %}
 </div>
 {% endblock %}
+
+{% macro render_table_win_loss_winpct_total(rows) -%}
+<table>
+  <thead>
+    <tr>
+      <th>Player</th>
+      <th>Win</th>
+      <th>Loss</th>
+      <th>Win%</th>
+      <th>Total</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for row in rows %}
+    <tr>
+      {% set win_pct = 100.0*row.top_N_win_count/row.top_N_count %}
+      <td class="text-left">{{ render_player(row.player) }}</td>
+      <td class="text-right">{{ row.top_N_win_count }}</td>
+      <td class="text-right">{{ row.top_N_loss_count }}</td>
+      <td class="text-right">{{ win_pct|int }}%</td>
+      <td class="text-right">{{ row.top_N_count }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{%- endmacro %}

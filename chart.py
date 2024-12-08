@@ -116,6 +116,7 @@ class Chart:
 
             interval_float = spread / count
             interval = round_down(int(interval_float), multiple_of=multiple_of)
+            interval = max(interval, multiple_of)
             self.set_major_tick_interval(interval)
 
         def set_major_formatter_fn(self, fn: Callable[[float, Any], str]):
