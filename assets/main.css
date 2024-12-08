@@ -61,6 +61,13 @@ p {
   line-height: 40px;
 }
 
+li {
+  margin: 4px 0;
+  text-align: left;
+  font-size: 36px;
+  line-height: 40px;
+}
+
 img {
   margin: 40px 0;
   display: block;
@@ -88,9 +95,18 @@ table th {
   text-align: center;
 }
 
+table tr {
+  border-bottom: 2px solid #44475a;
+}
+
+/* Allow border below header. */
+tbody tr:last-child {
+  border-bottom: none;
+}
+
 table td,
 table th {
-  padding: 4px 6px;
+  padding: 1px 2px;
   border-right: 2px solid #44475a;
 }
 
@@ -100,13 +116,13 @@ table th:last-child {
 }
 
 table .text-center {
-  text-align: center;
+  text-align: center !important;
 }
 
 table .text-left {
-  text-align: left;
+  text-align: left !important;
 }
 
 table .text-right {
-  text-align: right;
+  text-align: right !important;
 }

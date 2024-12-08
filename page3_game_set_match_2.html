@@ -1,0 +1,131 @@
+{% extends "page.html" %}
+{% block content %}
+
+<h1>Game, set, match 2</h1>
+
+<!-- MARK: Highest defeated -->
+
+<h2>Highest defeated opponent since {{ date_from }}</h2>
+
+<img src="{{ highest_defeated_chart }}">
+
+<div class="award_group">
+  <p>With this we can define an &ldquo;upset&rdquo;:</p>
+  <ul>
+    <li>1-11 can comfortably go against the TOP 3</li>
+    <li>12-26 can win with TOP 5</li>
+    <li>27-50 TOP 4 if difficult, but TOP 10 is doable</li>
+  </ul>
+</div>
+
+<div class="award_group">
+  <p class="award_emoji">🦈</p>
+  <p>
+    Shark award for the win with the biggest ranking difference.
+  </p>
+  <table>
+    <thead>
+      <tr>
+        <th>Player</th>
+        <th>Opponent</th>
+        <th>Rank diff.</th>
+        <th>Result</th>
+        <th>Tournament</th>
+        <th>Round</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for row in highest_defeated_awards %}
+      <tr>
+        <td class="text-left">{{ render_player(row.player) }}</td>
+        <td class="text-left">{{ render_player(row.opponent) }}</td>
+        <td class="text-right">{{ row.rank_diff }}</td>
+        <td class="text-left">{{ render_sets(row.match) }}</td>
+        <td class="text-left">{{ render_tournament(row.tournament) }}</td>
+        <td class="text-left">{{ render_round(row.match.round) }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+<div class="award_group">
+  <p class="award_emoji">🐡</p>
+  <p>
+    Blowfish award for defeating {{ render_player(player_no_1) }}.
+  </p>
+  <table>
+    <thead>
+      <tr>
+        <th>Player</th>
+        <th>Result</th>
+        <th>Tournament</th>
+        <th>Round</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for row in defeated_no_1_awards %}
+      <tr>
+        <td class="text-left">{{ render_player(row.player) }}</td>
+        <td class="text-left">{{ render_sets(row.match) }}</td>
+        <td class="text-left">{{ render_tournament(row.tournament) }}</td>
+        <td class="text-left">{{ render_round(row.match.round) }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+<!-- MARK: Game count -->
+
+<h2>Number of games since {{ date_from }}</h2>
+
+<img src="{{ game_count_chart }}">
+
+<div class="award_group">
+  <p class="award_emoji">🐎</p>
+  <p>
+    Work horse award for the most games played.
+  </p>
+  {{ render_table_game_count(game_count_awards_max) }}
+</div>
+
+
+<div class="award_group">
+  <p class="award_emoji">🐨</p>
+  <p>
+    Koala award for the least games played.
+  </p>
+  {{ render_table_game_count(game_count_awards_min) }}
+</div>
+
+{% endblock %}
+
+<!-- MARK: Macros -->
+
+{% macro render_table_game_count(rows) -%}
+<table>
+  <thead>
+    <tr>
+      <th>Player</th>
+      <th>Win</th>
+      <th>Win TB</th>
+      <th>Loss</th>
+      <th>Loss TB</th>
+      <th>Total</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for row in rows %}
+    <tr>
+      <td class="text-left">{{ render_player(row.player) }}</td>
+      <td class="text-right">{{ row.game_win_count }}</td>
+      <td class="text-right">{{ row.game_win_tie_break_count }}</td>
+      <td class="text-right">{{ row.game_lost_count }}</td>
+      <td class="text-right">{{ row.game_lost_tie_break_count }}</td>
+      <td class="text-right">{{ row.count_all }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{%- endmacro %}
