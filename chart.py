@@ -247,6 +247,44 @@ class Chart:
         if label is not None:
             y_axis.set_label(label)
 
+    def add_horizontal_line(
+        self,
+        y: int | float,
+        x_start: int | float,
+        x_end: int | float,
+        /,
+        label: str = "",
+        color: ColorLiteral | None = None,
+        line_width: int = 2,
+    ):
+        color2 = _color_literal_to_hex_or_none(color)
+        self.ax.hlines(
+            y,
+            x_start,
+            x_end,
+            label=label,
+            colors=color2,
+            linewidth=line_width,
+        )
+
+    def add_vertical_line(
+        self,
+        x: int | float,
+        y_start: int | float,
+        y_end: int | float,
+        /,
+        color: ColorLiteral | None = None,
+        line_width: int = 2,
+    ):
+        color2 = _color_literal_to_hex_or_none(color)
+        self.ax.vlines(
+            x,
+            y_start,
+            y_end,
+            colors=color2,
+            linewidth=line_width,
+        )
+
     def add_legend(self, entries: list[str] | None = None):
         if entries is None:
             self.fig.legend()
@@ -279,7 +317,7 @@ class Chart:
         value_to_color = dict[int | float, Chart.ColorRGBA]()
 
         for i, value in enumerate(values_sorted):
-            x = i / values_len
+            x = i / (values_len - 1)
             value_to_color[value] = cmap(x)
 
         return value_to_color

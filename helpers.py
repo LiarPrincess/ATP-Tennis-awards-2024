@@ -153,7 +153,8 @@ def round_down(n: int, *, multiple_of: int) -> int:
 def average(xs: Iterable[int | float]) -> float:
     # Iterate only once!
     lst = list(xs)
-    return 1.0 * sum(lst) / len(lst)
+    s = sum(lst)
+    return 1.0 * s / len(lst)
 
 
 # MARK: Collections

@@ -59,14 +59,14 @@ code {
   margin: 16px 0;
   text-align: center;
   font-size: 36px;
-  line-height: 40px;
+  line-height: 1.2;
 }
 
 li {
   margin: 4px 0;
   text-align: left;
   font-size: 36px;
-  line-height: 40px;
+  line-height: 1.2;
 }
 
 img {
@@ -83,6 +83,10 @@ img {
   text-align: center;
   font-size: 128px;
   line-height: 1;
+}
+
+.p_group {
+  margin: 50px 0;
 }
 
 table {

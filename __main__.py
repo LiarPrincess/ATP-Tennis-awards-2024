@@ -6,6 +6,7 @@ from page1_ranking import page1_ranking
 from page2_game_set_match import page2_game_set_match
 from page3_game_set_match_2 import page3_game_set_match_2
 from page4_map import page4_map
+from page5_body import page5_body
 
 _PLAYER_COUNT = 50
 # Day has to be one of the days the ranking is published.

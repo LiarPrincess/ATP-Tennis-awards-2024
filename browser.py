@@ -9,8 +9,8 @@ from playwright.sync_api import sync_playwright, ViewportSize
 def get_html_browser(
     url: str,
     *,
-    cache_path: str | None,
-    delay: int | None,
+    cache_path: str | None = None,
+    delay: int | None = None,
 ) -> str:
     urls = [url]
     d = get_htmls_browser(urls, cache_path=cache_path, delay=delay)
@@ -20,8 +20,8 @@ def get_html_browser(
 def get_htmls_browser(
     urls: list[str],
     *,
-    cache_path: str | None,
-    delay: int | None,
+    cache_path: str | None = None,
+    delay: int | None = None,
 ) -> dict[str, str]:
     cache = Cache(cache_path) if cache_path else None
     not_cached_urls = list[str]()

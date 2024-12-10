@@ -1,0 +1,182 @@
+{% extends "page.html" %}
+
+{% block content %}
+<h1>Age, body</h1>
+
+<!-- MARK: Age -->
+
+<h2>Age</h2>
+<img src="{{ age_chart }}">
+
+<div class="award_group">
+  <p class="award_emoji">🐣</p>
+  <p>Chick award for the youngest.</p>
+  {{ render_age_table(age_awards_min) }}
+</div>
+
+<div class="award_group">
+  <p class="award_emoji">🐦‍🔥</p>
+  <p>Phoenix award for the oldest.</p>
+  {{ render_age_table(age_awards_max) }}
+</div>
+
+<!-- MARK: [HW]eight -->
+
+<h2>Height</h2>
+<img src="{{ height_chart }}">
+
+<div class="award_group">
+  <p class="award_emoji">🐞</p>
+  <p>Ladybug award for the shortest.</p>
+  {{ render_height_weight_table(height_awards_min) }}
+</div>
+
+<div class="award_group">
+  <p class="award_emoji">🦒</p>
+  <p>Giraffe award for the tallest.</p>
+  {{ render_height_weight_table(height_awards_max) }}
+</div>
+
+<h2>Weight</h2>
+<img src="{{ weight_chart }}">
+
+<div class="award_group">
+  <p class="award_emoji">🪶</p>
+  <p>Feather award for the lightest.</p>
+  {{ render_height_weight_table(weight_awards_min) }}
+</div>
+
+<div class="award_group">
+  <p class="award_emoji">🐘</p>
+  <p>Elephant award for the heaviest.</p>
+  {{ render_height_weight_table(weight_awards_max) }}
+</div>
+
+<!-- MARK: Hand -->
+
+<h2>Hands</h2>
+
+<div class="award_group">
+  <p class="award_emoji">🐙</p>
+  <p>Octopus award for 1 handed backhand. (See table above.)</p>
+</div>
+
+<div class="award_group">
+  <p class="award_emoji">🍆</p>
+
+  <div class="p_group">
+    <p>
+      According to the Wikipedia 10% of the people are left handed. <br>
+      Tennis players are fairly close to that at 12%. <br>
+      It seems that nobody deserves the esteemed eggplant award.
+    </p>
+  </div>
+
+  <div class="p_group">
+    <p>
+      On the other hand 30% of the TOP 50 fencers are left handed. <br>
+      We can't award the ⅓ of the population!
+    </p>
+
+    <table>
+      <thead>
+        <tr>
+          <th>🤺</th>
+          <th>Female</th>
+          <th>Male</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="text-left">Épée</td>
+          <td class="text-right">18</td>
+          <td class="text-right">14</td>
+        </tr>
+        <tr>
+          <td class="text-left">Foil</td>
+          <td class="text-right">18</td>
+          <td class="text-right">19</td>
+        </tr>
+        <tr>
+          <td class="text-left">Saber</td>
+          <td class="text-right">12</td>
+          <td class="text-right">6</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="p_group">
+    <p>
+      Maybe we should give it to Anthony Ammirati? <br>
+      You know… the French pole vaulter from the Olympics.
+    </p>
+    <img width="{{ width }}" style="width: {{ width }}px; margin-left: -{{ padding_x }}px" src="Anthony Ammirati.webp">
+  </div>
+</div>
+
+
+{% endblock %}
+
+{% macro render_age_table(rows) -%}
+<table>
+  <thead>
+    <tr>
+      <th rowspan="2">Player</th>
+      <th rowspan="2">Birth date</th>
+      <th colspan="2">Age</th>
+      <th colspan="2">Pro</th>
+    </tr>
+    <tr>
+      <th>Years</th>
+      <th>Days</th>
+      <th>Started</th>
+      <th>Years since</th>
+      <!-- Fix missing right border. It is too much work to modify CSS. -->
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for row in rows %}
+    <tr>
+      <td class="text-left">{{ render_player(row.player) }}</td>
+      <td class="text-right">{{ row.birthday }}</td>
+      <td class="text-right">{{ row.age_years }}</td>
+      <td class="text-right">{{ row.age_days }}</td>
+      <td class="text-right">{{ row.age_pro }}</td>
+      <td class="text-right">{{ row.years_since_pro }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{%- endmacro %}
+
+{% macro render_height_weight_table(rows) -%}
+<table>
+  <thead>
+    <tr>
+      <th rowspan="2">Player</th>
+      <th colspan="2">Age</th>
+      <th rowspan="2">Height <br> [cm]</th>
+      <th rowspan="2">Weight <br> [kg]</th>
+    </tr>
+    <tr>
+      <th>Years</th>
+      <th>Days</th>
+      <!-- Fix missing right border. It is too much work to modify CSS. -->
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for row in rows %}
+    <tr>
+      <td class="text-left">{{ render_player(row.player) }}</td>
+      <td class="text-right">{{ row.age_years }}</td>
+      <td class="text-right">{{ row.age_days }}</td>
+      <td class="text-right">{{ row.height_cm }}</td>
+      <td class="text-right">{{ row.weight_kg }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{%- endmacro %}
