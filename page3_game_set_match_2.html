@@ -5,7 +5,7 @@
 
 <!-- MARK: Highest defeated -->
 
-<h2>Highest defeated opponent since {{ date_from }}</h2>
+<h2>Highest defeated opponent <br> since {{ date_from }}</h2>
 
 <img src="{{ highest_defeated_chart }}">
 
@@ -13,8 +13,8 @@
   <p>With this we can define an &ldquo;upset&rdquo;:</p>
   <ul>
     <li>1-11 can comfortably go against the TOP 3</li>
-    <li>12-26 can win with TOP 5</li>
-    <li>27-50 TOP 4 if difficult, but TOP 10 is doable</li>
+    <li>12-30 can win with TOP 5</li>
+    <li>31-50 TOP 5 is difficult, but TOP 10 is doable</li>
   </ul>
 </div>
 
@@ -47,6 +47,12 @@
       {% endfor %}
     </tbody>
   </table>
+
+  {% if giant_slayer %}
+  <p>
+    Seems like {{ render_player(giant_slayer) }} is a true giant slayer!
+  </p>
+  {% endif %}
 </div>
 
 <div class="award_group">

@@ -62,6 +62,7 @@ class Page:
 
     highest_defeated_chart: Chart
     highest_defeated_awards: list[HighestDefeatedRow]
+    giant_slayer: Player | None
     defeated_no_1_awards: list[HighestDefeatedRow]
 
     game_count_chart: Chart
@@ -80,18 +81,9 @@ def page3_game_set_match_2(
 
     highest_defeated_rows = _get_highest_defeated_rows(players, date_from)
     highest_defeated_chart = _highest_defeated_chart(highest_defeated_rows)
-
-    highest_defeated_awards = [
-        r
-        for r in highest_defeated_rows
-        if r.player.can_receive_award
-        and r.opponent.can_receive_award
-        and r.rank_diff > 0
-    ]
-    highest_defeated_awards = filter_award_max(
-        highest_defeated_awards,
-        count=award_count_highest_defeated,
-        key=lambda r: r.rank_diff,
+    highest_defeated_awards, giant_slayer = _get_highest_defeated_awards(
+        highest_defeated_rows,
+        award_count_highest_defeated,
     )
 
     defeated_no_1_awards = [
@@ -118,6 +110,7 @@ def page3_game_set_match_2(
         date_from=date_from_short,
         player_no_1=player_no_1,
         highest_defeated_chart=highest_defeated_chart,
+        giant_slayer=giant_slayer,
         highest_defeated_awards=highest_defeated_awards,
         defeated_no_1_awards=defeated_no_1_awards,
         game_count_chart=game_count_chart,
@@ -204,6 +197,39 @@ def _game_count_chart(rows: list[Page.GameCountRow]) -> Chart:
     y_axis.set_major_tick_count(y_max, 10, multiple_of=200)
 
     return chart
+
+
+# MARK: Awards
+
+
+def _get_highest_defeated_awards(
+    rows: list[Page.HighestDefeatedRow],
+    award_count: int,
+):
+    award_rows = [
+        r
+        for r in rows
+        if r.player.can_receive_award
+        and r.opponent.can_receive_award
+        and r.rank_diff > 0
+    ]
+    award_rows = filter_award_max(
+        award_rows,
+        count=award_count,
+        key=lambda r: r.rank_diff,
+    )
+
+    player_rows = group_by_key_id(award_rows, key=lambda r: r.player)
+    player_max_count = max(len(lst) for _, lst in player_rows)
+    player_rows_with_max_count = [
+        p for p, lst in player_rows if len(lst) == player_max_count
+    ]
+
+    giant_slayer = (
+        player_rows_with_max_count[0] if len(player_rows_with_max_count) == 1 else None
+    )
+
+    return award_rows, giant_slayer
 
 
 # MARK: Rows
