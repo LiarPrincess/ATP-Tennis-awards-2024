@@ -9,7 +9,7 @@
 <img src="{{ age_chart }}">
 
 <div class="award_group">
-  <p class="award_emoji">🐣</p>
+  <p class="award_emoji">🐥</p>
   <p>Chick award for the youngest.</p>
   {{ render_age_table(age_awards_min) }}
 </div>
@@ -26,8 +26,8 @@
 <img src="{{ height_chart }}">
 
 <div class="award_group">
-  <p class="award_emoji">🐞</p>
-  <p>Ladybug award for the shortest.</p>
+  <p class="award_emoji">🐜</p>
+  <p>Ant award for the shortest.</p>
   {{ render_height_weight_table(height_awards_min) }}
 </div>
 
@@ -56,12 +56,113 @@
 
 <h2>Hands</h2>
 
-<div class="award_group">
-  <p class="award_emoji">🐙</p>
-  <p>Octopus award for 1 handed backhand. (See table above.)</p>
+{% macro render_hand_quarter(rows, hand_quarter_class) -%}
+<div class="hand-quarter {{hand_quarter_class}}">
+  {% for row in rows %}
+  {{ render_player_rank(row.player) }}&nbsp;{{row.player.nationality.flag_emoji}}
+  {% endfor %}
+</div>
+{%- endmacro %}
+
+<div>
+  <p class="hand-label hand-label-top">1 handed backhand</p>
+  <div class="hand-middle-row">
+    <p class="hand-label hand-label-left">Left handed</p>
+    <div class="hand-content">
+      {{ render_hand_quarter(hand_left_backhand_1, "hand-quarter-left-top") }}
+      {{ render_hand_quarter(hand_right_backhand_1, "hand-quarter-right-top") }}
+      {{ render_hand_quarter(hand_left_backhand_2, "hand-quarter-left-bottom") }}
+      {{ render_hand_quarter(hand_right_backhand_2, "hand-quarter-right-bottom") }}
+    </div>
+    <p class="hand-label hand-label-right">Right handed</p>
+  </div>
+  <p class="hand-label hand-label-bottom">2 handed backhand</p>
 </div>
 
+<style>
+  .hand-label {
+    margin: 0;
+    font-size: 32px;
+  }
+
+  .hand-label-top,
+  .hand-label-bottom {
+    width: 100%;
+    text-align: center;
+  }
+
+  .hand-label-left {
+    writing-mode: vertical-lr;
+    text-align: center;
+    text-orientation: upright;
+  }
+
+  .hand-label-right {
+    writing-mode: vertical-rl;
+    text-align: center;
+    text-orientation: upright;
+  }
+
+  .hand-middle-row {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .hand-content {
+    width: 100%;
+    height: 650px;
+  }
+
+  .hand-quarter {
+    width: 50%;
+    height: 50%;
+    padding: 8px;
+    float: left;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 32px;
+    line-height: 1.2;
+  }
+
+  .hand-quarter-left-top {
+    border-right: 2px solid #44475a;
+    border-bottom: 2px solid #44475a;
+  }
+
+  .hand-quarter-right-top {
+    border-bottom: 2px solid #44475a;
+  }
+
+  .hand-quarter-left-bottom {
+    border-right: 2px solid #44475a;
+  }
+
+  .hand-quarter-right-bottom {}
+</style>
+
 <div class="award_group">
+  <p class="award_emoji">🐙</p>
+  <p>Octopus award for 1 handed backhand.</p>
+  <table>
+    <tbody>
+      {% for row in hand_left_backhand_1 %}
+      <tr>
+        <td class="text-left">{{ render_player(row.player) }}</td>
+      </tr>
+      {% endfor %}
+      {% for row in hand_right_backhand_1 %}
+      <tr>
+        <td class="text-left">{{ render_player(row.player) }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+</div>
+
+<div class="award_group" style="margin-bottom: 0;">
   <p class="award_emoji">🍆</p>
 
   <div class="p_group">
@@ -106,12 +207,13 @@
     </table>
   </div>
 
-  <div class="p_group">
+  <div class="p_group" style="margin-bottom: 0;">
     <p>
-      Maybe we should give it to Anthony Ammirati? <br>
+      Or Maybe we should hand it over to Anthony Ammirati? <br>
       You know… the French pole vaulter from the Olympics.
     </p>
-    <img width="{{ width }}" style="width: {{ width }}px; margin-left: -{{ padding_x }}px" src="Anthony Ammirati.webp">
+    <img width="{{ width }}" style="width: {{ width }}px; margin-left: -{{ padding_x }}px; margin-bottom: 0;"
+      src="Anthony Ammirati.webp">
   </div>
 </div>
 

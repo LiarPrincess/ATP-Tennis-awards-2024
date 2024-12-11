@@ -1,3 +1,9 @@
+from typing import Literal
+from dataclasses import dataclass
+from atp import Player
+from chart import Chart
+from helpers import *
+
 
 _YEAR_DAY_COUNT = 365
 
@@ -41,6 +47,11 @@ class Page:
     weight_awards_min: list[Row]
     weight_awards_max: list[Row]
 
+    hand_right_backhand_1: list[Row]
+    hand_right_backhand_2: list[Row]
+    hand_left_backhand_1: list[Row]
+    hand_left_backhand_2: list[Row]
+
 
 def page5_body(
     players: list[Player],
@@ -70,6 +81,25 @@ def page5_body(
         award_count=award_count_weight,
     )
 
+    hand_right_backhand_1 = list[Page.Row]()
+    hand_right_backhand_2 = list[Page.Row]()
+    hand_left_backhand_1 = list[Page.Row]()
+    hand_left_backhand_2 = list[Page.Row]()
+
+    for r in rows:
+        play_back = r.hand_play, r.hand_back
+
+        if play_back == ("R", "1"):
+            hand_right_backhand_1.append(r)
+        elif play_back == ("R", "2"):
+            hand_right_backhand_2.append(r)
+        elif play_back == ("L", "1"):
+            hand_left_backhand_1.append(r)
+        elif play_back == ("L", "2"):
+            hand_left_backhand_2.append(r)
+        else:
+            assert False, play_back
+
     return Page(
         age_chart=age_chart,
         age_awards_min=age_awards_min,
@@ -80,6 +110,10 @@ def page5_body(
         weight_chart=weight_chart,
         weight_awards_min=weight_awards_min,
         weight_awards_max=weight_awards_max,
+        hand_right_backhand_1=hand_right_backhand_1,
+        hand_right_backhand_2=hand_right_backhand_2,
+        hand_left_backhand_1=hand_left_backhand_1,
+        hand_left_backhand_2=hand_left_backhand_2,
     )
 
 
@@ -93,7 +127,7 @@ def _create_age_chart(rows: list[Page.Row]) -> Chart:
     ages_pro = [r.age_pro for r in rows]
     ages_pro_color_map = chart.create_color_map(
         ages_pro,
-        ["pink"],
+        ["purple"],
     )
     ages_pro_color = [ages_pro_color_map[r.age_pro] for r in rows]
     chart.add_bar(ranks, ages_pro, color=ages_pro_color)
@@ -102,7 +136,7 @@ def _create_age_chart(rows: list[Page.Row]) -> Chart:
     ages_from_pro = [r.age_decimal - r.age_pro for r in rows]
     ages_color_map = chart.create_color_map(
         ages,
-        ["orange"],
+        ["cyan"],
     )
     ages_color = [ages_color_map[a] for a in ages]
     chart.add_bar(ranks, ages_from_pro, bottom=ages_pro, color=ages_color)
@@ -116,20 +150,20 @@ def _create_age_chart(rows: list[Page.Row]) -> Chart:
         age_avg,
         rank_min - 0.4,
         rank_max + 0.4,
-        color="red",
+        color="yellow",
     )
     chart.add_horizontal_line(
         age_pro_avg,
         rank_min - 0.4,
         rank_max + 0.4,
-        color="green",
+        color="red",
     )
 
     chart.add_legend(
         [
             f"Average {age_avg:.1f} years",
-            f"Average age when becoming pro {age_pro_avg:.1f} years",
-            "Age when becoming pro",
+            f"Average age when pro {age_pro_avg:.1f} years",
+            "Age when pro",
             "Age",
         ]
     )
@@ -164,7 +198,7 @@ def _height_weight(
     values = [key(r) for r in rows]
     color_map = chart.create_color_map(
         values,
-        ["yellow", "pink"],
+        ["pink", "purple", "cyan"],
     )
     colors = [color_map[r] for r in values]
     chart.add_bar(ranks, values, color=colors)

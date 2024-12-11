@@ -9,9 +9,12 @@
   <link rel="stylesheet" href="main.css">
 </head>
 
+{% macro render_player_rank(p) -%}
+{{"&nbsp;"|safe if p.rank//10 == 0 else""}}{{p.rank}}
+{%- endmacro %}
+
 {% macro render_player(p) -%}
-{{"&nbsp;"|safe if p.rank//10 == 0
-else""}}{{p.rank}}&nbsp;{{p.nationality.flag_emoji}}&nbsp;{{p.name_first}}&nbsp;{{p.name_last}}
+{{render_player_rank(p)}}&nbsp;{{p.nationality.flag_emoji}}&nbsp;{{p.name_first}}&nbsp;{{p.name_last}}
 {%- endmacro %}
 
 {% macro _render_set(match, s) -%}
