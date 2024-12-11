@@ -180,6 +180,17 @@ class Chart:
     ):
         self.ax.bar(x, height, bottom=bottom, color=color)
 
+    def add_plot(
+        self,
+        x,
+        y,
+        label: str | None = None,
+        color: ColorLiteral | None = None,
+        line_width: int | None = None,
+    ):
+        color_2 = _color_literal_to_hex_or_none(color)
+        self.ax.plot(x, y, label=label, color=color_2, linewidth=line_width)
+
     # https://matplotlib.org/stable/api/markers_api.html
     ScatterMarker = Literal[
         ".", "o", "v", "^", "<", ">", "s", "p", "P", "*", "+", "x", "X", "D", "|", "_"

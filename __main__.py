@@ -7,6 +7,7 @@ from page2_game_set_match import page2_game_set_match
 from page3_game_set_match_2 import page3_game_set_match_2
 from page4_map import page4_map
 from page5_body import page5_body
+from page6_income import page6_income
 
 _PLAYER_COUNT = 50
 # Day has to be one of the days the ranking is published.
@@ -53,13 +54,10 @@ def main():
     )
     render_template("page3_game_set_match_2.html", data, "3_game_set_match_2.png")
 
-    print("4 Map")
-    data = page4_map(
-        players,
-        award_count_best_countries=3,
-        award_count_best_player_per_continent=5,
-    )
-    render_template("page4_map.html", data, "4_map.png")
+
+    print("6 Income")
+    data = page6_income(players)
+    render_template("page6_income.html", data, "6_income.png")
 
 
 def render_template(template_name: str, context: Any, image_name: str):
