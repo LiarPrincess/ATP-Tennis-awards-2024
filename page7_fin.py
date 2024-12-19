@@ -1,15 +1,16 @@
-from datetime import datetime
 from dataclasses import dataclass
 from atp import (
     Player,
     PlayerTournament,
-    PlayerMatch_Opponent,
+    PlayerMatch,
     PlayerMatch_Played,
     PlayerMatch_Retire,
     PlayerMatch_Default,
+    PlayerMatch_Bye,
+    PlayerMatch_NotPlayed,
+    PlayerMatch_Walkover,
     PlayerMatch_Set,
 )
-from chart import Chart
 from helpers import *
 
 
@@ -22,6 +23,7 @@ class Page:
         @dataclass
         class Tournament:
             tournament: PlayerTournament
+            matches: list[PlayerMatch]
             is_winner: bool
 
         player: Player
@@ -74,10 +76,26 @@ def _get_player_stats(
         if t.date < date_from:
             continue
 
-        last_m = t.matches[-1]
-        is_win = last_m.round.id == "F" and last_m.win_loss == "W"
-        dt = Page.PlayerStats.Tournament(t, is_win)
-        tournaments.append(dt)
+        matches = list[PlayerMatch]()
+
+        for m in t.matches:
+            if isinstance(
+                m,
+                PlayerMatch_Played
+                | PlayerMatch_Walkover
+                | PlayerMatch_Retire
+                | PlayerMatch_Default
+                | PlayerMatch_NotPlayed,
+            ):
+                matches.append(m)
+            elif isinstance(m, PlayerMatch_Bye):
+                pass
+            else:
+                assert_never(m)
+
+        m = t.matches[-1]
+        is_win = m.round.id == "F" and m.win_loss == "W"
+        tournaments.append(Page.PlayerStats.Tournament(t, matches, is_win))
 
         for m in t.matches:
             match_count += 1

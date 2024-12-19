@@ -8,11 +8,12 @@ from page3_game_set_match_2 import page3_game_set_match_2
 from page4_map import page4_map
 from page5_body import page5_body
 from page6_income import page6_income
+from page7_fin import page7_fin
 
 _PLAYER_COUNT = 50
 # Day has to be one of the days the ranking is published.
 # Go https://www.atptour.com/en/rankings/singles and use the date combo box.
-_RANKING_NOW_DAY = "2024-11-25"
+_RANKING_NOW_DAY = "2024-12-09"
 _RANKING_PAST_DAY = "2024-01-01"
 _RANKING_NOW_DATE = f"{_RANKING_NOW_DAY}T00:00:00"
 _RANKING_PAST_DATE = f"{_RANKING_PAST_DAY}T00:00:00"
@@ -54,10 +55,30 @@ def main():
     )
     render_template("page3_game_set_match_2.html", data, "3_game_set_match_2.png")
 
+    print("4 Map")
+    data = page4_map(
+        players,
+        award_count_best_countries=3,
+        award_count_best_player_per_continent=5,
+    )
+    render_template("page4_map.html", data, "4_map.png")
+
+    print("5 Body")
+    data = page5_body(
+        players,
+        award_count_age=5,
+        award_count_height=3,
+        award_count_weight=4,
+    )
+    render_template("page5_body.html", data, "5_body.png")
 
     print("6 Income")
     data = page6_income(players)
     render_template("page6_income.html", data, "6_income.png")
+
+    print("7 Fin")
+    data = page7_fin(players, date_from=_RANKING_PAST_DATE)
+    render_template("page7_fin.html", data, "7_fin.png")
 
 
 def render_template(template_name: str, context: Any, image_name: str):

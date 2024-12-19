@@ -14,7 +14,7 @@
 <p>
   Tip: for this type of charts you should stand further away, <br>
   this way your eyes will &ldquo;blend&rdquo; the colors, <br>
-  and it will be easier to see density.
+  and it will be easier to see the patterns.
 </p>
 
 <div class="award_group">
@@ -34,7 +34,7 @@
 
   {% for row in versus_awards_unlucky_main %}
   <h3>
-    {{ render_player(row.player) }}:
+    {{ render_player(row.player) }}
 
     {% if row.top_N_win_count == 1 %}
     1 win
@@ -107,7 +107,7 @@
   </table>
 
   {% if pair.dominant_player %}
-  <p>{{ render_player(pair.dominant_player) }} is truly a "top" in this relationship.</p>
+  <p>{{ render_player(pair.dominant_player) }} is truly a &ldquo;top&rdquo; in this relationship.</p>
   {% else %}
   <p>We hope they created a lot of happy memories together!</p>
   {% endif %}
@@ -133,7 +133,9 @@
       <td class="text-left">{{ render_player(row.player) }}</td>
       <td class="text-right">{{ row.top_N_win_count }}</td>
       <td class="text-right">{{ row.top_N_loss_count }}</td>
-      <td class="text-right">{{ win_pct|int }}%</td>
+      <td
+        class="text-right {% if win_pct >= 50 -%}text-green{%- endif -%} {% if win_pct <= 40 -%}text-red{%- endif -%}">
+        {{ win_pct|int }}%</td>
       <td class="text-right">{{ row.top_N_count }}</td>
     </tr>
     {% endfor %}

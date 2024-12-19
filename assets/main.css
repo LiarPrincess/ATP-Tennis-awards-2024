@@ -59,7 +59,7 @@ code {
   margin: 20px 0;
   text-align: center;
   font-size: 36px;
-  line-height: 1.2;
+  line-height: 1.23;
 }
 
 ul {
@@ -70,7 +70,7 @@ li {
   margin: 4px 0;
   text-align: center;
   font-size: 36px;
-  line-height: 1.2;
+  line-height: 1.23;
 }
 
 img {
@@ -87,6 +87,14 @@ img {
   text-align: center;
   font-size: 128px;
   line-height: 1;
+}
+
+.award_emoji_img {
+  display: block;
+  width: 180px;
+  height: 180px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .p_group {

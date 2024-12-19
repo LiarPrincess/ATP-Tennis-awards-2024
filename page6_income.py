@@ -87,7 +87,7 @@ def page6_income(players: list[Player]) -> Page:
     total_average_per_year_chart = _create_income_chart(
         ranks,
         total_per_year,
-        y_axis_label="Income [$1k or 0 if no data available]",
+        y_axis_label="Income [$1M or 0 if no data available]",
         y_axis_scale=_MILLION,
         y_axis_tick_interval=500 * _THOUSAND,
         average=total_per_year_avg,
@@ -134,6 +134,7 @@ def _create_income_chart(
             rank_max + 0.4,
             label=f"Average ${average_str}",
             color="red",
+            line_width=4,
         )
         chart.add_legend()
 
@@ -148,7 +149,7 @@ def _create_income_chart(
             poly_y,
             label="Trend",
             color="green",
-            line_width=2,
+            line_width=4,
         )
         chart.add_legend()
 

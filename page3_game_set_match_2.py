@@ -139,7 +139,7 @@ def _highest_defeated_chart(matches: list[Page.HighestDefeatedRow]) -> Chart:
     ranks = list(rank_to_highest_win)
     highest_win = [rank_to_highest_win[r] for r in ranks]
 
-    color_map = chart.create_color_map(highest_win, ["pink", "yellow"])
+    color_map = chart.create_color_map(highest_win, ["purple", "cyan"])
     colors = [color_map[b] for b in highest_win]
     chart.add_bar(ranks, highest_win, color=colors)
 
@@ -177,11 +177,11 @@ def _game_count_chart(rows: list[Page.GameCountRow]) -> Chart:
 
     count = [r.game_win_count for r in rows]
     tie_count = [r.game_win_tie_break_count for r in rows]
-    add_bars(count, tie_count, ["pink", "yellow"])
+    add_bars(count, tie_count, ["purple", "cyan"])
 
     count = [-r.game_lost_count for r in rows]
     tie_count = [-r.game_lost_tie_break_count for r in rows]
-    add_bars(count, tie_count, ["cyan", "purple"])
+    add_bars(count, tie_count, ["pink", "yellow"])
 
     chart.add_legend(["Win", "Win tie-break", "Loss", "Loss tie-break"])
 
