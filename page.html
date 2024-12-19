@@ -41,8 +41,16 @@
 {% endif %}
 {%- endmacro %}
 
+{% macro render_tournament_surface(t) -%}
+{%- if t.surface == "Clay" %}🟧
+{%- elif t.surface == "Grass" %}🟩
+{%- elif t.surface == "Hard" %}🟦
+{%- else %}{{ t.surface }}
+{%- endif %}
+{%- endmacro %}
+
 {% macro render_tournament(t) -%}
-{{ t.name }}
+{{ render_tournament_surface(t) }}&nbsp;{{ t.name }}
 {%- endmacro %}
 
 {% macro render_round(r) -%}

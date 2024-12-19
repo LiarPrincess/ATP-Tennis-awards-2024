@@ -56,15 +56,19 @@ h3 {
 
 p,
 code {
-  margin: 16px 0;
+  margin: 20px 0;
   text-align: center;
   font-size: 36px;
   line-height: 1.2;
 }
 
+ul {
+  list-style: inside;
+}
+
 li {
   margin: 4px 0;
-  text-align: left;
+  text-align: center;
   font-size: 36px;
   line-height: 1.2;
 }

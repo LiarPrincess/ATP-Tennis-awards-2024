@@ -13,11 +13,16 @@ class PlayerData:
 
     @property
     def can_receive_award(self) -> bool:
+        r = self.award_ineligibility_reason
+        return r is None
+
+    @property
+    def award_ineligibility_reason(self) -> Literal["Deceased"] | None:
         # That could be awkward or downright hurtful.
         if self.active == "Deceased":
-            return False
+            return "Deceased"
 
-        return True
+        return None
 
     def __init__(self, id: str, json: JSONDict) -> None:
         self.id = id.lower()

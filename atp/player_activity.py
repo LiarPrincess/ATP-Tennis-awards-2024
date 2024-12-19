@@ -32,6 +32,11 @@ class PlayerTournament:
         "PZ",  # Miscellaneous Prize Money, Profit Share…
     ]
 
+    @property
+    def date_short(self) -> str:
+        end = self.date.index("T")
+        return self.date[:end]
+
     @dataclass
     class Location:
         city: str | None

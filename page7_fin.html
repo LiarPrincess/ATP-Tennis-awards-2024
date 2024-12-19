@@ -1,0 +1,179 @@
+{% extends "page.html" %}
+
+{% block content %}
+
+<!-- MARK: Special -->
+
+<h1>Special awards</h1>
+
+<div class="award_group">
+  <p class="award_emoji">🐐</p>
+  <p>GOAT award for {{ render_player(djokovic.player) }}</p>
+</div>
+
+<div class="award_group">
+  <p class="award_emoji">🧀</p>
+  <p>
+    Cheese award for {{ render_player(djokovic.player) }},<br>
+    so that they can feed their GOAT.
+  </p>
+  <p>
+    They finished in TOP 10 by playing just <br>
+    {{ djokovic.tournaments|length }} tournaments ({{ djokovic.match_count }} matches, {{ djokovic.set_count }} sets, {{
+    djokovic.game_count }} games).
+  </p>
+  {{ render_tournaments(djokovic) }}
+
+  <!--
+  <div>
+    <p>
+      Real talk: can GOATs eat cheese? <br>
+      According to <span class="text-cyan">https://goatsauthority.com/can-goats-eat-cheese</span>:
+    </p>
+    <p>
+      Goats can eat cheese, but in moderation. It’s not their usual diet and too much could upset their stomachs.
+    </p>
+    <p>
+      Baby goats, also known as kids, <b>should not eat cheese</b>. Their stomachs are delicate and can’t handle it
+      well.
+    </p>
+  </div>
+-->
+</div>
+
+<div class="award_group">
+  <p class="award_emoji">🦙</p>
+  <p>
+    Llama award for {{ render_player(mensik.player) }}.
+  </p>
+  <ul>
+    <li>Youngest player in top 50</li>
+    <li>Defeated 8&nbsp;⬜&nbsp;Andrey&nbsp;Rublev and 10&nbsp;🇧🇬&nbsp;Grigor&nbsp;Dimitrov</li>
+  </ul>
+  {{ render_tournaments(mensik) }}
+</div>
+
+<div class="award_group">
+  <p class="award_emoji">🐶</p>
+  <p>Dog award for the golden retriever: 3&nbsp;🇪🇸&nbsp;Carlos&nbsp;Alcaraz.</p>
+</div>
+
+<div class="award_group">
+  <p class="award_emoji">🦚</p>
+  <p>
+    Peacock award for the best hair: 153&nbsp;🇪🇸&nbsp;Rafael&nbsp;Nadal.
+  </p>
+  <p>
+    I don't care about any other &ldquo;unofficial&rdquo; rankings, <br>
+    as long as 153&nbsp;🇪🇸&nbsp;Rafael&nbsp;Nadal is ranked, they automatically win.
+  </p>
+</div>
+
+<div class="award_group">
+  <p class="award_emoji">🍲</p>
+  <p>
+    Soup award for 16&nbsp;🇵🇱&nbsp;Hubert&nbsp;Hurkacz, <br>
+    so that they win something this year.
+  </p>
+  <p>
+    Any taste they want, as long as they do not redeem it. <br>
+    (I live in 🇵🇱&nbsp;Wrocław,&nbsp;Poland, same city.)
+  </p>
+</div>
+
+<!-- MARK: Ineligibility -->
+
+{% if award_ineligibility %}
+<h1>No awards</h1>
+
+<div class="award_group">
+  <p>
+    Following players were not taken into account when calculating the awards. <br>
+    I have nothing to do with it!
+  </p>
+  <table>
+    <thead>
+      <tr>
+        <th>Player</th>
+        <th>Reason</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for row in award_ineligibility %}
+      <tr>
+        <td class="text-left">{{ render_player(row.player) }}</td>
+        <td class="text-left">{{ row.reason }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endif %}
+
+<!-- MARK: Social media -->
+
+<!--
+<h1>Social media</h1>
+
+<p>
+  We could analyze players social media and run sentiment analysis on that to discover who is the most
+  &ldquo;positive&rdquo; player.
+</p>
+<p>
+  But our little edge-lord Elmo Musk forces people to pay $200/month for large scale access to Tweets. 😠
+</p>
+<p>
+  At the same time most of the players have social media managers whose only job is to make everything boring.
+</p>
+-->
+
+<!-- MARK: Thanks -->
+
+<h1>Thanks</h1>
+
+{%
+set awards_data = [
+("🎾", "atptour.com", "tennis data (used without permission)", "text-cyan"),
+("🤺", "fie.org", "fencing data", "text-cyan"),
+("🌍", "naturalearthdata.com", "map data", "text-cyan"),
+("🇺🇦", "github.com/annexare/Countries", "country data", "text-cyan"),
+("🧛", "Dracula", "color theme", ""),
+("📊", "mathplotlib", "ploting the plots", ""),
+("📜", "Inconsolata", "fonting the font", ""),
+]
+%}
+<!-- TODO: getty images for eggplant award -->
+
+{% for emoji, url, what, color in awards_data %}
+<p>{{ emoji }} <span class="{{ color }}">{{ url }}</span> for {{ what }}.</p>
+{% endfor %}
+
+{% endblock %}
+
+<!-- MARK: Macros -->
+
+{% macro render_tournaments(player) -%}
+<table class="tight">
+  <thead>
+    <tr>
+      <th>Date</th>
+      <th>Tournament</th>
+      <th>Type</th>
+      <th>Rounds</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for row in player.tournaments %}
+    <tr>
+      <td class="text-left">{{ row.tournament.date_short }}</td>
+      <td class="text-left">{{ render_tournament(row.tournament) }}</td>
+      <td class="text-left">{{ row.tournament.type }}</td>
+      <td class="text-left">
+        {% for m in row.tournament.matches %}{{ render_round(m.round) }} {% endfor %}
+        {% if row.is_winner %}🏆{% else %}{% endif %}
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{%- endmacro %}
