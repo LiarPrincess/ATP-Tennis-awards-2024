@@ -59,7 +59,7 @@ def main():
     data = page4_map(
         players,
         award_count_best_countries=3,
-        award_count_best_player_per_continent=5,
+        award_count_best_player_per_continent=6,
     )
     render_template("page4_map.html", data, "4_map.png")
 

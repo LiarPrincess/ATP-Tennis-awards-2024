@@ -93,7 +93,7 @@ def page3_game_set_match_2(
     ]
     defeated_no_1_awards.sort(key=lambda r: r.tournament.date)
 
-    game_count_rows = _get_game_count_rows(players, date_from)
+    game_count_rows = get_game_count_rows(players, date_from)
     game_count_chart = _game_count_chart(game_count_rows)
     game_count_awards_max = filter_award_max(
         game_count_rows,
@@ -276,7 +276,7 @@ def _get_highest_defeated_rows(
     return result
 
 
-def _get_game_count_rows(
+def get_game_count_rows(
     players: list[Player], date_from: str
 ) -> list[Page.GameCountRow]:
     result = list[Page.GameCountRow]()

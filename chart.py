@@ -5,6 +5,7 @@ import matplotlib.axes as pltAxes
 import matplotlib.axis as pltAxis
 import matplotlib.colors as pltColors
 import matplotlib.figure as pltFigure
+import matplotlib.legend as pltLegend
 import matplotlib.ticker as pltTicker
 import matplotlib.collections as pltCollections
 import matplotlib.font_manager as pltFontManager
@@ -296,11 +297,34 @@ class Chart:
             linewidth=line_width,
         )
 
-    def add_legend(self, entries: list[str] | None = None):
+    @dataclass
+    class Legend:
+        legend: pltLegend.Legend
+
+        def set_color(
+            self,
+            index: int,
+            fill: "Chart.ColorLiteral | None" = None,
+            edge: "Chart.ColorLiteral | None" = None,
+        ):
+            handle = self.legend.legend_handles[index]
+            assert handle is not None
+
+            fill2 = _color_literal_to_hex_or_none(fill)
+            handle.set_facecolor(fill2)
+
+            edge2 = _color_literal_to_hex_or_none(edge)
+            handle.set_edgecolor(edge2)
+
+    def add_legend(self, entries: list[str] | None = None) -> Legend:
+        l: pltLegend.Legend
+
         if entries is None:
-            self.fig.legend()
+            l = self.fig.legend()
         else:
-            self.fig.legend(entries)
+            l = self.fig.legend(entries)
+
+        return Chart.Legend(l)
 
     def create_color_map(
         self,

@@ -134,7 +134,7 @@ def _create_income_chart(
             rank_max + 0.4,
             label=f"Average ${average_str}",
             color="red",
-            line_width=4,
+            line_width=3,
         )
         chart.add_legend()
 
@@ -149,7 +149,7 @@ def _create_income_chart(
             poly_y,
             label="Trend",
             color="green",
-            line_width=4,
+            line_width=3,
         )
         chart.add_legend()
 

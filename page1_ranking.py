@@ -134,16 +134,22 @@ def _create_rank_change_chart(rows: list[Page.Row]) -> Chart:
     rank = [r.rank_now for r in rows]
     rank_change = [r.rank_change for r in rows]
 
-    # Separate color map for gain and loss
-    color_map_gain = chart.create_color_map(
-        (r for r in rank_change if r >= 0), "purple_cyan"
-    )
-    color_map_loss = chart.create_color_map(
-        (r for r in rank_change if r <= 0), "red_pink"
-    )
+    # Gain
+    gain = [max(c, 0) for c in rank_change]
+    gain_color_map = chart.create_color_map(gain, "purple_cyan")
+    gain_colors = [gain_color_map[c] for c in gain]
+    chart.add_bar(rank, gain, color=gain_colors)
 
-    color = [color_map_gain[c] if c >= 0 else color_map_loss[c] for c in rank_change]
-    chart.add_bar(rank, rank_change, color=color)
+    # Loss
+    loss = [min(c, 0) for c in rank_change]
+    loss_color_map = chart.create_color_map(loss, "red_pink")
+    loss_colors = [loss_color_map[c] for c in loss]
+    chart.add_bar(rank, loss, color=loss_colors)
+
+    # Legend
+    legend = chart.add_legend(["Gain", "Loss"])
+    legend.set_color(0, "cyan")
+    legend.set_color(1, "red")
 
     # X axis
     x_axis = chart.x_axis

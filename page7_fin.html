@@ -64,7 +64,7 @@
     Peacock award for the best hair: 153&nbsp;🇪🇸&nbsp;Rafael&nbsp;Nadal.
   </p>
   <p>
-    I don't care about any other &ldquo;unofficial&rdquo; rankings, <br>
+    I don&rsquo;t care about any other &ldquo;unofficial&rdquo; rankings; <br>
     as long as 153&nbsp;🇪🇸&nbsp;Rafael&nbsp;Nadal is ranked, they automatically win.
   </p>
 </div>
@@ -77,7 +77,7 @@
   </p>
   <p>
     Any taste they want, as long as they do not redeem it. <br>
-    (I live in 🇵🇱&nbsp;Wrocław,&nbsp;Poland, same city.)
+    (I live in 🇵🇱&nbsp;Wrocław,&nbsp;Poland, the same city.)
   </p>
 </div>
 
@@ -133,19 +133,26 @@
 
 {%
 set awards_data = [
-("🎾", "atptour.com", "tennis data (used without permission)", "text-cyan"),
-("🤺", "fie.org", "fencing data", "text-cyan"),
-("🌍", "naturalearthdata.com", "map data", "text-cyan"),
-("🇺🇦", "github.com/annexare/Countries", "country data", "text-cyan"),
-("🧛", "Dracula", "color theme", ""),
-("📊", "mathplotlib", "ploting the plots", ""),
-("📜", "Inconsolata", "fonting the font", ""),
+("🎾", "atptour.com", "Tennis data (used without permission)", "text-cyan"),
+("🤺", "fie.org", "Fencing data", "text-cyan"),
+("🌍", "naturalearthdata.com", "Map data", "text-cyan"),
+("🇺🇦", "github.com/annexare/Countries", "Country data", "text-cyan"),
+("🧛", "Dracula", "Colors", ""),
+("📊", "mathplotlib", "Plots", ""),
+("📜", "Inconsolata", "Font", ""),
 ]
 %}
 
-{% for emoji, url, what, color in awards_data %}
-<p>{{ emoji }} <span class="{{ color }}">{{ url }}</span> for {{ what }}.</p>
-{% endfor %}
+<table>
+  <tbody>
+    {% for emoji, url, what, color in awards_data %}
+    <tr>
+      <td class="text-left">{{ emoji }} <span class="{{ color }}">{{ url }}</span></td>
+      <td class="text-left">{{ what }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
 
 {% endblock %}
 

@@ -37,7 +37,8 @@ class Page:
     continent_awards_europe: list[Player]
     continent_awards_north_america: list[Player]
     continent_awards_asia: list[Player]
-    continent_awards_other: list[Player]
+    continent_awards_south_america: list[Player]
+    continent_awards_oceania: list[Player]
 
 
 def page4_map(
@@ -79,7 +80,12 @@ def page4_map(
     continent_awards_europe = continent_best(lambda c: c.id == "EU")
     continent_awards_north_america = continent_best(lambda c: c.id == "NA")
     continent_awards_asia = continent_best(lambda c: c.id == "AS")
-    continent_awards_other = continent_best(lambda c: c.id not in ("EU", "NA", "AS"))
+    continent_awards_south_america = continent_best(lambda c: c.id == "SA")
+    continent_awards_oceania = continent_best(lambda c: c.id == "OC")
+
+    for p in players:
+        c = p.nationality.continent
+        assert c.id in ("EU", "NA", "AS", "SA", "OC")
 
     return Page(
         map_chart=map_chart,
@@ -88,7 +94,8 @@ def page4_map(
         continent_awards_europe=continent_awards_europe,
         continent_awards_north_america=continent_awards_north_america,
         continent_awards_asia=continent_awards_asia,
-        continent_awards_other=continent_awards_other,
+        continent_awards_south_america=continent_awards_south_america,
+        continent_awards_oceania=continent_awards_oceania,
     )
 
 

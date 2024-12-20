@@ -12,7 +12,7 @@
   <p class="award_emoji">🦄</p>
   <p>Unicorn award for the biggest raise.</p>
   <p>
-    {{ player_no_1.name_first }} {{ player_no_1.name_last }} ending the year as No. 1 is impressive,<br>
+    {{ render_player(player_no_1) }} ending the year as No. 1 is impressive,<br>
     but gaining {{ rank_change_max_gain }} positions in PIF ATP Ranking is also nice.
   </p>
   {{ render_rank_change_award_table(rank_change_awards_max_gain) }}

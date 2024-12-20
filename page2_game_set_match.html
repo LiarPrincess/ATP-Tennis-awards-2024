@@ -6,13 +6,13 @@
 <h2>Match count since {{ date_from }}</h2>
 
 <p>
-  All games, including the Olympics etc. <br> Only singles (as in 1 on 1 matches, not their marriage status).
+  All tournaments, including the Olympics etc. <br> Only singles (as in 1-on-1 matches, not their marriage status).
 </p>
 
 <img src="{{ versus_chart }}">
 
 <p>
-  Tip: for this type of charts you should stand further away, <br>
+  For this type of chart you should stand further away; <br>
   this way your eyes will &ldquo;blend&rdquo; the colors, <br>
   and it will be easier to see the patterns.
 </p>
@@ -34,7 +34,7 @@
 
   {% for row in versus_awards_unlucky_main %}
   <h3>
-    {{ render_player(row.player) }}
+    {{ render_player(row.player) }},
 
     {% if row.top_N_win_count == 1 %}
     1 win
@@ -79,7 +79,7 @@
 </div>
 
 <div class="award_group">
-  <p class="award_emoji">🦢❤️🦢</p>
+  <p class="award_emoji">🦜🦜</p>
   <p>Lovebird award for the most common pair outside of the top 10.</p>
 
   {% for pair in versus_awards_love %}

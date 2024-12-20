@@ -11,6 +11,7 @@ from atp import (
     PlayerMatch_Walkover,
     PlayerMatch_Set,
 )
+from page3_game_set_match_2 import get_game_count_rows
 from helpers import *
 
 
@@ -70,7 +71,6 @@ def _get_player_stats(
     tournaments = list[Page.PlayerStats.Tournament]()
     match_count = 0
     set_count = 0
-    game_count = 0
 
     for t in p.career_tournaments:
         if t.date < date_from:
@@ -99,19 +99,14 @@ def _get_player_stats(
 
         for m in t.matches:
             match_count += 1
-
             sets = getattr(m, "sets", None)
+
             if sets is not None:
                 assert isinstance(sets, list)
+                set_count += len(sets)
 
-                for s in sets:
-                    assert isinstance(s, PlayerMatch_Set)
-                    set_count += 1
-
-                    game_count += s.opponent
-                    game_count += s.player
-
-                    if s.tie_break is not None:
-                        game_count += 1
+    game_rows = get_game_count_rows(players, date_from)
+    games_p = find(game_rows, lambda r: r.player.id == p.id)
+    game_count = games_p.count_all
 
     return Page.PlayerStats(p, tournaments, match_count, set_count, game_count)
