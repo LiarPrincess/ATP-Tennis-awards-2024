@@ -93,9 +93,11 @@ def _get_player_stats(
             else:
                 assert_never(m)
 
-        m = t.matches[-1]
-        is_win = m.round.id == "F" and m.win_loss == "W"
-        tournaments.append(Page.PlayerStats.Tournament(t, matches, is_win))
+        # 'PZ' (prize only) tournaments may not have any matches.
+        if t.matches:
+            m = t.matches[-1]
+            is_win = m.round.id == "F" and m.win_loss == "W"
+            tournaments.append(Page.PlayerStats.Tournament(t, matches, is_win))
 
         for m in t.matches:
             match_count += 1

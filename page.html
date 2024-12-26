@@ -54,7 +54,7 @@
 {%- endmacro %}
 
 {% macro render_round(r) -%}
-{{ r.id }}
+<span class="{% if r.id in ('F', 'SF', 'QF') -%}text-pink{%- endif -%}">{{ r.id }}</span>
 {%- endmacro %}
 
 <body>

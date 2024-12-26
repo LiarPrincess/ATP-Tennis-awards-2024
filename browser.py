@@ -42,7 +42,7 @@ def get_htmls_browser(
     with sync_playwright() as p:
         browser = p.chromium.launch(headless=False)
         page = browser.new_page(viewport=ViewportSize(width=1920, height=1080))
-        url_len = len(urls)
+        url_len = len(not_cached_urls)
 
         for index, url in enumerate(not_cached_urls):
             if index != 0 and delay is not None:

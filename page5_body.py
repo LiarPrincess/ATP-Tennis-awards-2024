@@ -1,11 +1,9 @@
 from typing import Literal
+from datetime import datetime, timedelta
 from dataclasses import dataclass
 from atp import Player
 from chart import Chart
 from helpers import *
-
-
-_YEAR_DAY_COUNT = 365
 
 
 @dataclass
@@ -33,7 +31,7 @@ class Page:
 
         @property
         def age_decimal(self) -> float:
-            return self.age_years + self.age_days / _YEAR_DAY_COUNT
+            return self.age_years + self.age_days / 366.0
 
     age_chart: Chart
     age_awards_min: list[Row]
@@ -244,9 +242,6 @@ def _height_weight(
 
 
 def _get_rows(players: list[Player]) -> list[Page.Row]:
-
-    from datetime import datetime
-
     result = list[Page.Row]()
     now = datetime.now()
 
@@ -255,8 +250,7 @@ def _get_rows(players: list[Player]) -> list[Page.Row]:
 
         birth_date_str = p.birth_date
         birth_date = datetime.fromisoformat(birth_date_str)
-        age_delta = now - birth_date
-        age_years, age_days = divmod(age_delta.days, _YEAR_DAY_COUNT)
+        age_years, age_days = _date_diff_years_days(birth_date, now)
 
         if p.pro_year is None:
             age_pro = 0
@@ -281,3 +275,25 @@ def _get_rows(players: list[Player]) -> list[Page.Row]:
         )
 
     return result
+
+
+def _date_diff_years_days(past: datetime, now: datetime) -> tuple[int, int]:
+    now = datetime(year=now.year, month=now.month, day=now.day)
+    year_count = now.year - past.year
+    last_birthday = datetime(year=now.year, month=past.month, day=past.day)
+    had_birthday = now >= last_birthday
+
+    if not had_birthday:
+        year_count -= 1
+        last_birthday = datetime(year=now.year - 1, month=past.month, day=past.day)
+
+    day_count = 0
+    day_count_day = last_birthday
+    day = timedelta(days=1)
+
+    while day_count_day != now:
+        day_count_day += day
+        day_count += 1
+
+    # print(f"{past} | {year_count} years {day_count} days")
+    return year_count, day_count

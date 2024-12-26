@@ -8,7 +8,7 @@
 
 <div class="award_group">
   <p class="award_emoji">🐐</p>
-  <p>GOAT award for {{ render_player(djokovic.player) }}</p>
+  <p>GOAT award for {{ render_player(djokovic.player) }}.</p>
 </div>
 
 <div class="award_group">
@@ -44,11 +44,12 @@
 <div class="award_group">
   <p class="award_emoji">🦙</p>
   <p>
-    Llama award for {{ render_player(mensik.player) }}.
+    Llama award for the most standout player: {{ render_player(mensik.player) }}.
   </p>
   <ul>
     <li>Youngest player in the top 50</li>
-    <li>Defeated 8&nbsp;⬜&nbsp;Andrey&nbsp;Rublev and 10&nbsp;🇧🇬&nbsp;Grigor&nbsp;Dimitrov</li>
+    <li>Defeated 8&nbsp;⬜&nbsp;Andrey&nbsp;Rublev and 10&nbsp;🇧🇬&nbsp;Grigor&nbsp;Dimitrov twice</li>
+    <li>🙈🙉🙊 2024 Next Generation ATP Finals</li>
   </ul>
   {{ render_tournaments(mensik) }}
 </div>
@@ -136,7 +137,7 @@ set awards_data = [
 ("🎾", "atptour.com", "Tennis data (used without permission)", "text-cyan"),
 ("🤺", "fie.org", "Fencing data", "text-cyan"),
 ("🌍", "naturalearthdata.com", "Map data", "text-cyan"),
-("🇺🇦", "github.com/annexare/Countries", "Country data", "text-cyan"),
+("🇵🇱", "github.com/annexare/Countries", "Country data", "text-cyan"),
 ("🧛", "Dracula", "Colors", ""),
 ("📊", "mathplotlib", "Plots", ""),
 ("📜", "Inconsolata", "Font", ""),
@@ -175,7 +176,7 @@ set awards_data = [
       <td class="text-left">{{ render_tournament(row.tournament) }}</td>
       <td class="text-left">{{ row.tournament.type }}</td>
       <td class="text-left">
-        {% for m in row.matches %}{{ render_round(m.round) }} {% endfor %}
+        {% for m in row.matches %}{{ render_round(m.round) }}&nbsp;{% endfor %}
         {% if row.is_winner %}🏆{% else %}{% endif %}
       </td>
     </tr>

@@ -261,6 +261,7 @@
   <thead>
     <tr>
       <th rowspan="2">Player</th>
+      <th rowspan="2">Birth date</th>
       <th colspan="2">Age</th>
       <th rowspan="2">Height <br> [cm]</th>
       <th rowspan="2">Weight <br> [kg]</th>
@@ -276,6 +277,7 @@
     {% for row in rows %}
     <tr>
       <td class="text-left">{{ render_player(row.player) }}</td>
+      <td class="text-right">{{ row.birthday }}</td>
       <td class="text-right">{{ row.age_years }}</td>
       <td class="text-right">{{ row.age_days }}</td>
       <td class="text-right">{{ row.height_cm }}</td>

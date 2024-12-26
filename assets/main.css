@@ -62,13 +62,8 @@ code {
   line-height: 1.23;
 }
 
-ul {
-  list-style: inside;
-}
-
 li {
-  margin: 4px 0;
-  text-align: center;
+  margin: 8px 0;
   font-size: 36px;
   line-height: 1.23;
 }

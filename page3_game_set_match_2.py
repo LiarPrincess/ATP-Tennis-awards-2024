@@ -317,8 +317,16 @@ def get_game_count_rows(
                             elif s.opponent == 1:
                                 assert s.player == 0
                                 row.game_lost_tie_break_count += 1
+                            # 4:3 - ATP Next Gen 2024
+                            elif s.player == 4:
+                                assert s.opponent == 3
+                                row.game_win_tie_break_count += 1
+                            elif s.opponent == 4:
+                                assert s.player == 3
+                                row.game_lost_tie_break_count += 1
+                            # Other?
                             else:
-                                assert False, "Tie-break requires 7:6 or 1:0"
+                                assert False, "Tie-break requires 7:6, 4:3, 1:0"
 
                 elif isinstance(
                     m,

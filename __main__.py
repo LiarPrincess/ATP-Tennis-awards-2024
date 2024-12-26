@@ -13,7 +13,7 @@ from page7_fin import page7_fin
 _PLAYER_COUNT = 50
 # Day has to be one of the days the ranking is published.
 # Go https://www.atptour.com/en/rankings/singles and use the date combo box.
-_RANKING_NOW_DAY = "2024-12-09"
+_RANKING_NOW_DAY = "2024-12-23"
 _RANKING_PAST_DAY = "2024-01-01"
 _RANKING_NOW_DATE = f"{_RANKING_NOW_DAY}T00:00:00"
 _RANKING_PAST_DATE = f"{_RANKING_PAST_DAY}T00:00:00"
