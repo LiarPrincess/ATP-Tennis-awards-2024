@@ -223,6 +223,11 @@
 
 <!-- MARK: Macros -->
 
+{% macro render_birth_day(row) -%}
+{{ row.birthday }}{% if row.has_birthday %}&nbsp;🎂{%
+endif %}
+{%- endmacro %}
+
 {% macro render_age_table(rows) -%}
 <table>
   <thead>
@@ -245,7 +250,7 @@
     {% for row in rows %}
     <tr>
       <td class="text-left">{{ render_player(row.player) }}</td>
-      <td class="text-right">{{ row.birthday }}</td>
+      <td class="text-left">{{ render_birth_day(row) }}</td>
       <td class="text-right">{{ row.age_years }}</td>
       <td class="text-right">{{ row.age_days }}</td>
       <td class="text-right">{{ row.age_pro }}</td>
@@ -277,7 +282,7 @@
     {% for row in rows %}
     <tr>
       <td class="text-left">{{ render_player(row.player) }}</td>
-      <td class="text-right">{{ row.birthday }}</td>
+      <td class="text-left">{{ render_birth_day(row) }}</td>
       <td class="text-right">{{ row.age_years }}</td>
       <td class="text-right">{{ row.age_days }}</td>
       <td class="text-right">{{ row.height_cm }}</td>

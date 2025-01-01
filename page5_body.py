@@ -5,6 +5,9 @@ from atp import Player
 from chart import Chart
 from helpers import *
 
+_NOW = datetime.now()
+_TODAY = datetime(_NOW.year, _NOW.month, _NOW.day)
+
 
 @dataclass
 class Page:
@@ -24,6 +27,11 @@ class Page:
         @property
         def birthday(self) -> str:
             return substring_until(self.player.birth_date, "T")
+
+        @property
+        def has_birthday(self) -> bool:
+            b = datetime.fromisoformat(self.player.birth_date)
+            return b.day == _TODAY.day and b.month == _TODAY.month
 
         @property
         def years_since_pro(self) -> int:
@@ -243,14 +251,13 @@ def _height_weight(
 
 def _get_rows(players: list[Player]) -> list[Page.Row]:
     result = list[Page.Row]()
-    now = datetime.now()
 
     for p in players:
         assert p.rank
 
         birth_date_str = p.birth_date
         birth_date = datetime.fromisoformat(birth_date_str)
-        age_years, age_days = _date_diff_years_days(birth_date, now)
+        age_years, age_days = _date_diff_years_days(birth_date, _TODAY)
 
         if p.pro_year is None:
             age_pro = 0
